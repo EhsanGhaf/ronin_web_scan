@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RONIN.CORE // Multi-Chain Deep Tracking Telemetry</title>
+    <link class="brand-favicon" rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+    <style>
+        :root {
+            --bg-deep-sea: #050d1a;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #0b1a30 0%, #040a14 100%);
+            --glass-bg: rgba(6, 17, 33, 0.65);
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --text-muted: #6b7c96;
+
+            /* نئون آکسنت‌های لوکس تیره بلاکچینی و سایبرپانک */
+            --accent-green: #00ffaa;
+            --accent-orange: #ff9f1c;
+            --accent-blue: #00bbf9;
+            --accent-red: #ff3366;
+            --accent-gold: #e0aa3e;
+            --accent-purple: #9b5de5;
+            --accent-yellow: #fee440;
+        }
+
+        /* اسکرول‌بار اختصاصی شبکه */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep-sea); }
+        ::-webkit-scrollbar-thumb { background: #102542; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #1b3b6f; }
+
+        body {
+            background: var(--bg-deep-sea);
+            background-image: var(--bg-gradient);
+            color: #ffffff;
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+            position: relative;
+            letter-spacing: -0.2px;
+        }
+
+        /* خطوط ماتریکسی ظریف پس‌زمینه گرید لوپ */
+        body::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 80px 80px; pointer-events: none; z-index: 0;
+        }
+
+        .full-section {
+            padding: 100px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* پنل شیشه‌ای ارتقا یافته ملوانی دسکتاپ */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        /* هدر / ناوگیت کامل به همراه لوگوی اصلی */
+        .nav-gate {
+            background: rgba(5, 13, 26, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: fixed;
+            width: 100%; top: 0; z-index: 9999;
+        }
+        .brand-logo {
+            width: 24px; height: 24px; object-fit: contain; filter: grayscale(100%) brightness(200%); opacity: 0.9;
+        }
+        .hero-logo-box {
+            display: flex; align-items: center; gap: 15px; margin-bottom: 25px;
+        }
+        .hero-logo-large {
+            width: 42px; height: 42px; object-fit: contain; filter: grayscale(100%) brightness(200%);
+        }
+        .nav-link-custom {
+            color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-family: var(--font-mono); transition: color 0.2s;
+        }
+        .nav-link-custom:hover, .nav-link-custom.active { color: #fff; }
+
+        /* بج لایو اپراتور */
+        .ops-badge {
+            background: rgba(0, 255, 170, 0.05); border: 1px solid rgba(0, 255, 170, 0.2);
+            color: #ffffff; font-family: var(--font-mono); font-size: 0.72rem;
+            padding: 6px 14px; border-radius: 30px; display: inline-flex; align-items: center; gap: 8px; letter-spacing: 0.5px;
+        }
+        .ops-badge .pulse-dot {
+            width: 6px; height: 6px; background-color: var(--accent-green); border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-green); animation: pulseGlow 1.8s infinite;
+        }
+        @keyframes pulseGlow { 0%, 100% { opacity: 0.5; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.2); } }
+
+        /* تلمتری کارت‌ها */
+        .telemetry-box {
+            padding: 22px; background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 10px; transition: all 0.3s;
+        }
+        .telemetry-box:hover {
+            background: rgba(255, 255, 255, 0.03); border-color: rgba(0, 255, 170, 0.2);
+        }
+
+        .data-label { font-size: 0.68rem; font-family: var(--font-mono); color: var(--text-muted) !important; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+        .huge-number { font-size: 2.8rem; font-family: var(--font-mono); font-weight: 700; letter-spacing: -1px; color: #fff; }
+
+        /* ساختار رادار مانیتورینگ ترافیک بلاکچین */
+        .radar-container {
+            width: 100%; max-width: 440px; aspect-ratio: 1 / 1;
+            background: rgba(4, 13, 26, 0.6); border: 1px solid rgba(0, 255, 170, 0.12);
+            border-radius: 20px; position: relative; overflow: hidden; margin: 0 auto;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.5);
+        }
+        .radar-sweep {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: conic-gradient(from 0deg, rgba(0, 255, 170, 0.22) 0deg, rgba(0, 255, 170, 0.04) 40deg, transparent 180deg);
+            border-radius: 50%; animation: radarSweepAnimation 7s linear infinite; transform-origin: center; z-index: 2; pointer-events: none;
+        }
+        @keyframes radarSweepAnimation { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .radar-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 30%, rgba(0, 255, 170, 0.02) 31%, transparent 32%, transparent 55%, rgba(0, 255, 170, 0.02) 56%, transparent 57%);
+        }
+        .radar-blip { position: absolute; width: 8px; height: 8px; border-radius: 50%; z-index: 3; }
+        .radar-blip.green { background: #00ffaa; box-shadow: 0 0 12px #00ffaa; }
+        .radar-blip.orange { background: #ff9f1c; box-shadow: 0 0 12px #ff9f1c; }
+        .radar-label { position: absolute; font-family: var(--font-mono); font-size: 10px; color: rgba(255, 255, 255, 0.6); transform: translate(12px, -4px); }
+        .blip-1 { top: 35%; left: 68%; }
+        .blip-2 { top: 62%; left: 38%; }
+        .radar-meta-footer {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px 20px;
+            background: linear-gradient(to top, rgba(4, 13, 26, 0.95), transparent);
+            display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 11px; z-index: 4;
+        }
+
+        /* سرتیفیکیت و شناسنامه تراکنش */
+        .cert-card { background: #030a14; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; font-family: var(--font-mono); overflow: hidden; }
+        .cert-header { background: rgba(255, 255, 255, 0.02); padding: 12px 20px; font-size: 11px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+        .cert-body { padding: 20px; }
+        .cert-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-size: 13px; }
+        .cert-label { color: var(--text-muted); text-transform: uppercase; }
+        .cert-value { color: #ffffff; }
+
+        /* آمار ۴ تایی متصل */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; margin-top: 40px; }
+        @media(max-width: 992px){ .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card { background: #061121; padding: 30px; }
+        .stat-card h2 { font-size: 2.3rem; font-weight: 700; margin-bottom: 5px; font-family: var(--font-mono); color: #fff; }
+        .stat-card p { font-size: 0.75rem; color: var(--text-muted); margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* تراکنش‌های جاری و پورت‌ها */
+        .transit-item {
+            background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 8px; padding: 14px 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono);
+        }
+        .transit-route { font-size: 13px; font-weight: 500; color: #fff; }
+        .transit-path { font-size: 11px; color: var(--text-muted); }
+        .transit-status { font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+        .status-transit { background: rgba(0, 187, 249, 0.08); color: var(--accent-blue); border: 1px solid rgba(0, 187, 249, 0.15); }
+        .status-cleared { background: rgba(0, 255, 170, 0.08); color: var(--accent-green); border: 1px solid rgba(0, 255, 170, 0.15); }
+
+        .port-table { font-family: var(--font-mono); font-size: 12px; width: 100%; }
+        .port-table td { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); }
+        .port-id { color: var(--text-muted); }
+        .port-name { color: #fff; font-weight: 500; }
+
+        .mini-map-container {
+            background: rgba(4, 14, 28, 0.4); border: 1px solid rgba(255,255,255,0.03); border-radius: 12px; height: 100%; min-height: 280px;
+            position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+        .mini-map-container::before {
+            content: ''; position: absolute; width: 100%; height: 100%; background-image: radial-gradient(rgba(0, 255, 170, 0.06) 1px, transparent 1px); background-size: 16px 16px;
+        }
+
+        /* تایپوگرافی عمومی هیرو */
+        h1 { font-family: var(--font-sans); font-size: 3.6rem; font-weight: 800; letter-spacing: -1.5px; line-height: 1.15; }
+        h2 { font-family: var(--font-sans); font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 15px; }
+        h3 { font-weight: 700; font-size: 1.25rem; color: #fff; }
+        .section-tag { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent-green); letter-spacing: 2px; display: inline-block; margin-bottom: 10px; text-transform: uppercase; }
+        .tech-paragraph { font-size: 1.02rem; line-height: 1.75; color: #94a3b8; }
+
+        .highlight-gold {
+            color: var(--accent-gold); background: linear-gradient(120deg, #ffe082 0%, #e0aa3e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* دکمه‌ها */
+        .btn-marine-primary {
+            background: #ffffff; color: #040a14; padding: 13px 26px; font-weight: 700; font-size: 0.85rem; border-radius: 6px;
+            text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase;
+        }
+        .btn-marine-primary:hover { background: #f1f5f9; transform: translateY(-1px); }
+        .btn-marine-secondary {
+            background: rgba(255, 255, 255, 0.03); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 13px 26px; font-weight: 600; font-size: 0.85rem; border-radius: 6px; text-decoration: none; transition: all 0.2s;
+        }
+        .btn-marine-secondary:hover { background: rgba(255, 255, 255, 0.08); color: #ffffff; }
+
+        /* کاروسل لوگوها */
+        .marquee-container { overflow: hidden; width: 100%; background: rgba(4, 11, 22, 0.4); border-top: 1px solid rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.03); padding: 18px 0; }
+        .marquee-inner { display: flex; gap: 80px; width: max-content; animation: moveMarquee 35s linear infinite; }
+        .marquee-node { display: flex; align-items: center; gap: 12px; filter: grayscale(100%) opacity(40%); transition: all 0.3s; }
+        .marquee-node:hover { filter: grayscale(0%) opacity(100%); }
+        .marquee-icon { height: 22px; width: auto; }
+        .marquee-label { font-size: 0.78rem; font-family: var(--font-mono); font-weight: 700; }
+        @keyframes moveMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* گرید کارت‌های ان‌اف‌تی و متادیتا */
+        .nft-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-top: 25px; }
+        .nft-animate-card { background: #081526; border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 10px; overflow: hidden; transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
+        .nft-animate-card:hover { transform: translateY(-4px); border-color: rgba(0, 255, 170, 0.25); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4); }
+        .nft-image-wrapper { position: relative; height: 200px; overflow: hidden; background: #020612; }
+        .nft-image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .brand-badge-on-nft { position: absolute; top: 12px; right: 12px; background: rgba(4, 10, 20, 0.85); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px; font-size: 11px; font-family: var(--font-mono); font-weight: 700; }
+        .nft-card-info { padding: 18px; }
+        .nft-card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; color: #fff; }
+        .nft-card-tokenid { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+
+        pre { background: #030912 !important; border: 1px solid rgba(255,255,255,0.04); color: var(--accent-green) !important; padding: 22px; border-radius: 8px; font-family: var(--font-mono); font-size: 13px; }
+        .typed-cursor { color: var(--accent-green); animation: blink 0.7s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .hero-features { display: flex; gap: 25px; flex-wrap: wrap; margin-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.04); padding-top: 18px; }
+        .feat-node { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #cbd5e1; font-family: var(--font-mono); }
+        .feat-node i { color: var(--accent-green); }
+
+        /* استایل‌های اختصاصی ورودی تعاملی ممیزی */
+        #user-crypto-input:focus {
+            border-color: var(--accent-green) !important;
+            box-shadow: 0 0 15px rgba(0, 255, 170, 0.2);
+            background: rgba(6, 23, 48, 0.9) !important;
+        }
+        #btn-run-analysis:hover {
+            background: #00d48f;
+            box-shadow: 0 0 15px rgba(0, 255, 170, 0.4);
+            transform: scale(1.02);
+        }
+        .input-attention-wrapper::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 6px; pointer-events: none;
+            box-shadow: 0 0 10px rgba(0, 255, 170, 0.05);
+            animation: borderGlowPulse 2.5s infinite;
+        }
+        @keyframes borderGlowPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        .audit-bullet-node { display: flex; gap: 10px; align-items: start; margin-bottom: 10px; color: #cbd5e1; }
+    @media print {
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+    </style>
+</head>
+<body>
+
+    <nav class="nav-gate py-3">
+        <div class="container-fluid px-5 d-flex justify-content-between align-items-center">
+            <a class="text-white text-decoration-none fw-bold small tracking-wide d-flex align-items-center gap-2" href="#" style="font-family: var(--font-mono)">
+                <img src="favicon.png" class="brand-logo" alt="logo">
+                RONIN<span style="color:var(--text-muted)">.</span>CORE
+            </a>
+            <div class="d-none d-md-flex gap-4">
+                <a href="#" class="nav-link-custom active">Home</a>
+                <a href="#architecture" class="nav-link-custom">Infrastructure</a>
+                <a href="#bitcoin-core" class="nav-link-custom">UTXO Stream</a>
+                <a href="#ethereum-core" class="nav-link-custom">EVM Analytics</a>
+                <a href="#api-product" class="nav-link-custom">API Gate</a>
+            </div>
+            <span class="text-muted small" style="font-family: var(--font-mono)">// SYSTEM_STATUS: <span style="color: var(--accent-green);">OPERATIONAL_GRID</span></span>
+        </div>
+    </nav>
+
+    <section class="full-section" style="margin-top: 60px;">
+        <div class="container px-5">
+            <div class="row g-5">
+                <div class="col-lg-7">
+                    <div class="glass-panel h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="hero-logo-box">
+                                <img src="favicon.png" class="hero-logo-large" alt="Ronin Core Engine">
+                                <span class="section-tag">// SUBSYSTEM_BOOT_SEQUENCE_2026</span>
+                            </div>
+                            <h1 id="typewriter-target" class="mb-4"></h1>
+                            <p class="tech-paragraph mb-4">
+                                An isolated, enterprise-grade multi-chain ledger auditing matrix. Engineered to ingest high-frequency cryptographic state variants, decompose packed transaction logs, map deep smart contract inheritance configurations, and enforce unified compliance streams across distributed node systems.
+                            </p>
+                        </div>
+                        <div>
+                            <div class="d-flex flex-wrap gap-3">
+                                <a href="/portal" class="btn-marine-primary">[ INITIALIZE_OPERATOR_CONSOLE ]</a>
+                                <a href="#architecture" class="btn-marine-secondary">Track by Tx Hash</a>
+                            </div>
+                            <div class="hero-features">
+                                <div class="feat-node"><i class="fa-solid fa-shield-check"></i> Realtime Risk Scoring</div>
+                                <div class="feat-node"><i class="fa-solid fa-microchip"></i> Multi-Chain Audit Matrix</div>
+                                <div class="feat-node"><i class="fa-solid fa-database"></i> Zero-Knowledge Ingress</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="cert-card h-100 d-flex flex-column justify-content-between" style="border: 1px solid rgba(0, 255, 170, 0.25); box-shadow: 0 0 35px rgba(0, 255, 170, 0.08); background: #030a16;">
+
+                        <div class="cert-header d-flex justify-content-between align-items-center" style="padding: 15px 20px;">
+                            <span>OPERATOR_CONSOLE // METRIC INGRESS</span>
+                            <span id="console-badge" style="font-size: 9px; padding: 3px 8px; border-radius: 4px; background: rgba(0,255,170,0.1); color: var(--accent-green); font-family: var(--font-mono);">[ READY_FOR_INPUT ]</span>
+                        </div>
+
+                        <div class="cert-body" style="padding: 25px;">
+                            <div class="mb-4 input-attention-wrapper" style="position: relative;">
+                                <label style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-green); margin-bottom: 8px; display: block; letter-spacing: 1px;">
+                                    <i class="fa-solid fa-terminal"></i> LOAD TARGET (TX HASH OR WALLET ADDRESS)
+                                </label>
+                                <div class="d-flex gap-2">
+                                    <input type="text" id="user-crypto-input" placeholder="Paste 0x... or T... address/hash"
+                                           style="width: 100%; background: rgba(4, 15, 32, 0.85); border: 1px solid rgba(0, 255, 170, 0.3); border-radius: 6px; padding: 12px 15px; color: #fff; font-family: var(--font-mono); font-size: 12px; outline: none; transition: all 0.3s ease;">
+                                    <button id="btn-run-analysis" style="background: var(--accent-green); color: #040a14; border: none; border-radius: 6px; padding: 0 20px; font-family: var(--font-mono); font-weight: 700; font-size: 12px; text-transform: uppercase; transition: all 0.2s;">
+                                        ANALYZE
+                                    </button>
+                                </div>
+                                <div class="pulse-line" style="height: 2px; width: 100%; background: linear-gradient(90deg, transparent, var(--accent-green), transparent); margin-top: 6px; position: relative; overflow: hidden;"></div>
+                            </div>
+
+                            <div id="analysis-output-screen" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.04); border-radius: 8px; padding: 18px; min-height: 210px; display: flex; flex-direction: column; justify-content: center;">
+                                <div id="placeholder-text" class="text-center text-muted" style="font-family: var(--font-mono); font-size: 12px;">
+                                    <i class="fa-solid fa-satellite-dish fa-spin fs-4 mb-2 d-block" style="color: rgba(0, 255, 170, 0.4)"></i>
+                                    AWAITING OPERATOR HANDSHAKE...<br>
+                                    <span style="font-size: 10px; opacity: 0.6;">Provide an asset vector to extract risk telemetry.</span>
+                                </div>
+
+                                <div id="results-content" style="display: none; font-family: var(--font-mono);">
+                                    <h6 style="color: #fff; font-size: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">
+                                        <i class="fa-solid fa-chart-bar" style="color: var(--accent-blue)"></i> TELEMETRY AUDIT REPORT
+                                    </h6>
+                                    <div id="audit-bullets" style="font-size: 12px; line-height: 1.8;">
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="marquee-container">
+        <div class="marquee-inner">
+            <div class="marquee-node"><img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" onerror="handleGlobalImgFallback(this)" class="marquee-icon"><span class="marquee-label">BITCOIN_CORE</span></div>
+            <div class="marquee-node"><img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" onerror="handleGlobalImgFallback(this)" class="marquee-icon"><span class="marquee-label">ETHEREUM_NODE</span></div>
+            <div class="marquee-node"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" onerror="handleGlobalImgFallback(this)" class="marquee-icon"><span class="marquee-label">BNB_SMART_CHAIN</span></div>
+            <div class="marquee-node"><img src="https://cryptologos.cc/logos/tron-trx-logo.svg" onerror="handleGlobalImgFallback(this)" class="marquee-icon"><span class="marquee-label">TRON_PROTOCOL</span></div>
+            <div class="marquee-node"><img src="https://cryptologos.cc/logos/toncoin-ton-logo.svg" onerror="handleGlobalImgFallback(this)" class="marquee-icon"><span class="marquee-label">TON_DEFI</span></div>
+            <div class="marquee-node"><img src="https://cryptologos.cc/logos/polygon-matic-logo.svg" onerror="handleGlobalImgFallback(this)" class="marquee-icon"><span class="marquee-label">POLYGON_POS</span></div>
+            <div class="marquee-node"><img src="https://cryptologos.cc/logos/bitcoin-btc-logo.svg" onerror="handleGlobalImgFallback(this)" class="marquee-icon"><span class="marquee-label">BITCOIN_CORE</span></div>
+            <div class="marquee-node"><img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" onerror="handleGlobalImgFallback(this)" class="marquee-icon"><span class="marquee-label">ETHEREUM_NODE</span></div>
+            <div class="marquee-node"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" onerror="handleGlobalImgFallback(this)" class="marquee-icon"><span class="marquee-label">BNB_SMART_CHAIN</span></div>
+        </div>
+    </div>
+
+    <section class="full-section">
+        <div class="container px-5">
+            <span class="section-tag">// LIVE OPERATIONS</span>
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <h2 class="m-0">Always maintain operational visibility.</h2>
+                <a href="#" class="btn-marine-secondary btn-sm" style="font-family: var(--font-mono)">Open the dashboard &rarr;</a>
+            </div>
+            <p class="tech-paragraph mb-5" style="max-width: 750px;">A unified view across cryptographic safety, transaction payload streams, and active contract security vectors — refreshed in real-time for uninterrupted situational awareness.</p>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="radar-container w-100" style="max-width: 100%;">
+                        <div class="radar-sweep"></div>
+                        <div class="radar-screen"></div>
+                        <div class="radar-blip green blip-1"><span class="radar-label">TX_VAL_ATLAS</span></div>
+                        <div class="radar-blip orange blip-2"><span class="radar-label">TX_MAL_ORION</span></div>
+                        <div class="radar-meta-footer">
+                            <div>
+                                <span style="color: var(--text-muted)">SECTOR OVERVIEW // CRYPTO MATRIX</span><br>
+                                <strong style="color: #fff;">14 core channels verified</strong>
+                            </div>
+                            <div class="text-end">
+                                <span style="color: var(--accent-green); font-weight: bold;">&bull; LIVE</span><br>
+                                <span style="color: var(--text-muted)" id="live-time">03:42:00 UTC</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="glass-panel h-100" style="padding: 30px;">
+                        <div class="d-flex justify-content-between mb-4 align-items-center" style="font-family: var(--font-mono); font-size: 12px;">
+                            <span class="text-white fw-bold">ACTIVE PIPELINE TRANSITS</span>
+                            <span class="text-muted">54 - IN RUNTIME</span>
+                        </div>
+                        <div class="transit-item">
+                            <div>
+                                <div class="transit-route">MEMPOOL_INBOUND - ADDR_0x7a25</div>
+                                <div class="transit-path">Input Hash &rarr; Validation Matrix</div>
+                            </div>
+                            <span class="transit-status status-transit">IN TRANSIT</span>
+                        </div>
+                        <div class="transit-item">
+                            <div>
+                                <div class="transit-route">EVM_CONTRACT_EXEC - ADDR_0x1111</div>
+                                <div class="transit-path">Liquidity Routing &rarr; Target Block</div>
+                            </div>
+                            <span class="transit-status status-cleared">CLEARED</span>
+                        </div>
+                        <div class="transit-item">
+                            <div>
+                                <div class="transit-route">SUSPECTED_DEFI_ATTEMPT - ADDR_0xbf3a</div>
+                                <div class="transit-path">Flash-Loan Lock &rarr; Audit Gate</div>
+                            </div>
+                            <span class="transit-status status-transit" style="color: var(--accent-orange); border-color: rgba(255,159,28,0.2); background: rgba(255,159,28,0.05);">AT ANCHOR</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h2>15,000+</h2>
+                    <p>Cryptographic Channels Secured</p>
+                </div>
+                <div class="stat-card">
+                    <h2>99.9%</h2>
+                    <p>Verified Ledger Integrity</p>
+                </div>
+                <div class="stat-card">
+                    <h2>500 +</h2>
+                    <p>Specialized Node Operators</p>
+                </div>
+                <div class="stat-card">
+                    <h2>&lt; 30 min</h2>
+                    <p>Anomalous Response Deployment</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="full-section">
+        <div class="container px-5">
+            <span class="section-tag">// PRODUCT COVERAGE & SECURITY CORE</span>
+            <h2>Smart Contract Invariant Guard & Fake Deposit Ingress</h2>
+            <p class="tech-paragraph mb-5" style="max-width: 800px;">
+                Advanced Deception Engine. Our proprietary tracking matrix exposes complex malicious configurations in real time. Ronin Core natively evaluates incoming ledger state handshakes to immediately flag and isolate fake transaction deposits generated by fraudulent, modified, or unverified smart contracts before capital pollution occurs.
+            </p>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <table class="port-table">
+                        <tr><td class="port-id">ZK-INVARIANT</td><td class="port-name">Zero-Knowledge State Check</td><td class="port-id">FAKE-DEP-FILTER</td><td class="port-name">Fake Deposit Shield</td></tr>
+                        <tr><td class="port-id">EVM-DECOMPOSE</td><td class="port-name">EVM Log Decomposition</td><td class="port-id">MAL-CONTRACT</td><td class="port-name">Deceptive Script Hunter</td></tr>
+                        <tr><td class="port-id">FLASH-GUARD</td><td class="port-name">Flash-Loan Vectors Trace</td><td class="port-id">HOT-WALLET-IN</td><td class="port-name">Hot Wallet Compliance</td></tr>
+                        <tr><td class="port-id">NODE-ORACLE</td><td class="port-name">Distributed Oracle Sync</td><td class="port-id">CHAIN-SHARD-A</td><td class="port-name">Asynchronous Shard Audit</td></tr>
+                    </table>
+                </div>
+                <div class="mini-map-container" style="position: relative; background: #030a16; border: 1px solid rgba(255, 51, 102, 0.15); overflow: hidden; min-height: 320px; border-radius: 12px;">
+
+                    <div style="position: absolute; top: 15px; left: 20px; font-family: var(--font-mono); font-size: 11px; z-index: 10; background: rgba(3, 10, 22, 0.8); padding: 6px 12px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">
+                        <span style="color: var(--accent-green); mr-3">&bull; VALID_CONTRACT</span> <br>
+                        <span style="color: var(--accent-red);">&bull; FAKE_DEPOSIT (BURNING)</span>
+                    </div>
+
+                    <div style="position: absolute; top: 15px; right: 20px; font-family: var(--font-mono); font-size: 11px; z-index: 10; color: rgba(255,255,255,0.4);">
+                        SYS_LOG: <span style="color: var(--accent-red);" id="graph-log">ISOLATING_MALICIOUS_HEX</span>
+                    </div>
+
+                    <div id="matrix-canvas-simulation" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;">
+                        <div style="position: absolute; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(0, 255, 170, 0.2), transparent); top: 0; animation: scanLineMove 4s linear infinite;"></div>
+                    </div>
+
+                    <style>
+                        @keyframes scanLineMove {
+                            0% { top: 0%; }
+                            100% { top: 100%; }
+                        }
+
+                        /* انیمیشن پالس و حذف کانترکت فیک */
+                        @keyframes contractBurnEffect {
+                            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 12px #ff3366; }
+                            50% { transform: scale(1.6); opacity: 0.8; background: #ffffff; box-shadow: 0 0 25px #ff3366, inset 0 0 10px #ff3366; }
+                            100% { transform: scale(0); opacity: 0; filter: blur(5px); }
+                        }
+
+                        /* انیمیشن حرکت کانترکت‌های امن */
+                        @keyframes contractFloat {
+                            0% { transform: translate(0, 0); opacity: 0.8; }
+                            50% { transform: translate(15px, -15px); opacity: 1; }
+                            100% { transform: translate(0, 0); opacity: 0.8; }
+                        }
+                    </style>
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+                            const canvasContainer = document.getElementById("matrix-canvas-simulation");
+                            const logElement = document.getElementById("graph-log");
+
+                            // کلمات کلیدی برای کانترکت‌های جعلی و واقعی
+                            const fakeContractsNames = ["Fake_USDT_v2", "Deceptive_Vault", "HoneyPot_Router", "FakeDeposit_Inbound"];
+                            const validContractsNames = ["Ronin_LP_Pool", "ZK_Verifier", "Oracle_Feed_A"];
+
+                            function spawnContractNode() {
+                                if (!canvasContainer) return;
+
+                                const isMalicious = Math.random() > 0.4; // ۴۰ درصد شانس فیک بودن برای ایجاد هیجان بصری
+                                const node = document.createElement("div");
+
+                                // موقعیت تصادفی اولیه روی گراف
+                                const posX = Math.floor(Math.random() * 80) + 10;
+                                const posY = Math.floor(Math.random() * 70) + 15;
+
+                                node.style.position = "absolute";
+                                node.style.left = posX + "%";
+                                node.style.top = posY + "%";
+                                node.style.fontFamily = "var(--font-mono)";
+                                node.style.fontSize = "9px";
+                                node.style.display = "flex";
+                                node.style.flexDirection = "column";
+                                node.style.alignItems = "center";
+                                node.style.transition = "all 2s ease";
+
+                                // ایجاد بخش نقطه نئونی
+                                const dot = document.createElement("div");
+                                dot.style.width = "7px";
+                                dot.style.height = "7px";
+                                dot.style.borderRadius = "50%";
+                                dot.style.marginBottom = "4px";
+
+                                // ایجاد برچسب اسم کانترکت
+                                const label = document.createElement("span");
+                                label.style.padding = "2px 4px";
+                                label.style.borderRadius = "3px";
+                                label.style.background = "rgba(4, 12, 24, 0.8)";
+
+                                if (isMalicious) {
+                                    // کانترکت فیک (قرمز و در حال سوختن)
+                                    dot.style.background = "var(--accent-red)";
+                                    dot.style.animation = "contractBurnEffect 2.5s cubic-bezier(0.4, 0, 1, 1) forwards";
+                                    label.innerText = fakeContractsNames[Math.floor(Math.random() * fakeContractsNames.length)] + " [!]";
+                                    label.style.color = "var(--accent-red)";
+                                    label.style.border = "1px solid rgba(255, 51, 102, 0.2)";
+
+                                    // بروزرسانی لوگ سیستم هنگام ردیابی تراکنش دروغین
+                                    setTimeout(() => {
+                                        if(logElement) logElement.innerHTML = `<span style="color: var(--accent-red); font-weight: bold;">BURNED: ${label.innerText}</span>`;
+                                    }, 500);
+                                } else {
+                                    // کانترکت امن (سبز و در حال حرکت ملایم)
+                                    dot.style.background = "var(--accent-green)";
+                                    dot.style.boxShadow = "0 0 8px var(--accent-green)";
+                                    dot.style.animation = "contractFloat 4s ease-in-out infinite";
+                                    label.innerText = validContractsNames[Math.floor(Math.random() * validContractsNames.length)];
+                                    label.style.color = "rgba(255,255,255,0.7)";
+                                }
+
+                                node.appendChild(dot);
+                                node.appendChild(label);
+                                canvasContainer.appendChild(node);
+
+                                // حذف المان‌های فیک بعد از اتمام انیمیشن سوختن، و المان‌های امن بعد از چرخه عمرشان برای سبک ماندن حافظه مرورگر
+                                setTimeout(() => {
+                                    node.remove();
+                                }, isMalicious ? 2500 : 8000);
+                            }
+
+                            // زمان‌بندی تزریق مداوم اسمارت‌کانترکت‌ها به شبکه گراف
+                            setInterval(spawnContractNode, 1500);
+                            // لود اولیه دو گره
+                            spawnContractNode();
+                            spawnContractNode();
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section id="architecture" class="full-section" style="padding: 80px 0; background: rgba(5, 13, 26, 0.4);">
+        <div class="container px-5">
+            <span class="section-tag">// INFRASTRUCTURE LEDGER & NEURAL INTEGRATION</span>
+            <h2 class="mb-5">Ingress Infrastructure & <span style="color: var(--accent-blue);">State</span> Machine</h2>
+
+            <div class="row g-4 align-items-stretch">
+
+                <div class="col-lg-5 d-flex flex-column gap-4">
+
+                    <div class="glass-panel" style="padding: 22px; flex: 1;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h3 style="font-size: 1.1rem; color: #fff; margin: 0;">01 / Hex Ingestion</h3>
+                            <span style="font-size: 10px; color: var(--text-muted); font-family: var(--font-mono);">[STAGE_01]</span>
+                        </div>
+                        <p class="text-white-50 small lh-base mb-0" style="font-size: 12px; opacity: 0.75;">
+                            Intercepts atomic transaction payloads directly from lower-level memory pool queues. Extracts execution parameters, gas allocation states, and conditional branch routes before data consensus finalization.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel" style="padding: 22px; flex: 1;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h3 style="font-size: 1.1rem; color: #fff; margin: 0;">02 / Invariant Guard</h3>
+                            <span style="font-size: 10px; color: var(--accent-red); font-family: var(--font-mono);">[SECURITY_LAYER]</span>
+                        </div>
+                        <p class="text-white-50 small lh-base mb-0" style="font-size: 12px; opacity: 0.75;">
+                            Validates token contract safety constraints. Evaluates balance modifications against known malicious interface templates, ensuring zero balance pollution across exchange hot-wallet destinations.
+                        </p>
+                    </div>
+
+                    <div class="glass-panel" style="padding: 22px; flex: 1;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h3 style="font-size: 1.1rem; color: #fff; margin: 0;">03 / Quantum Accounting</h3>
+                            <span style="font-size: 10px; color: var(--accent-gold); font-family: var(--font-mono);">[MATH_PRECISION]</span>
+                        </div>
+                        <p class="text-white-50 small lh-base mb-0" style="font-size: 12px; opacity: 0.75;">
+                            Implements high-precision numeric evaluation modules supporting large multi-precision integer architectures. Eliminates scaling errors across asset representations during structural multi-chain tracking loops.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="glass-panel h-100 d-flex flex-column justify-content-between" style="padding: 35px; border-color: rgba(0, 255, 170, 0.25); background: linear-gradient(135deg, rgba(6, 22, 44, 0.7) 0%, rgba(4, 10, 20, 0.9) 100%); box-shadow: 0 0 35px rgba(0, 255, 170, 0.08); position: relative; overflow: hidden;">
+
+                        <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--accent-green); filter: blur(90px); opacity: 0.15; pointer-events: none;"></div>
+
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-green); letter-spacing: 1px; font-weight: 700;">// ENTERPRISE NEURAL HUB</span>
+                                <span class="badge" style="background: rgba(0, 255, 170, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 255, 170, 0.2); font-family: var(--font-mono); font-size: 10px; padding: 5px 10px;">🔴 LIVE API STREAM</span>
+                            </div>
+
+                            <h3 style="font-size: 1.6rem; color: #fff; font-weight: 800; margin-bottom: 15px;">04 / AI Autonomous Agent Ingress</h3>
+
+                            <p class="text-white-50 lh-base" style="font-size: 13.5px; opacity: 0.9; margin-bottom: 25px;">
+                                Exposes structural telemetry pipelines to third-party Neural Networks, Fraud-Detection models, and LLM Agents via secure, ultra-low-latency webhook streams.
+                                <br><br>
+                                <strong style="color: #fff;">Enterprise Empowerment:</strong> External companies can natively mount their autonomous AI models to ingest our decoded state variables. This allows enterprise AI instances to instantly execute machine-learning threat detection on deceptive contract invocations, suspicious velocity spikes, and anomalous cross-chain deposit behaviors in real-time.
+                            </p>
+                        </div>
+
+                        <div style="background: rgba(3, 9, 18, 0.7); border: 1px solid rgba(255,255,255,0.03); border-radius: 8px; padding: 18px; font-family: var(--font-mono);">
+                            <div class="text-white-50 small mb-2" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-network-wired me-2" style="color: var(--accent-green);"></i>Enterprise AI Connection Blueprint:</div>
+                            <div style="font-size: 11.5px; color: #cbd5e1; direction: ltr; text-align: left; line-height: 1.6;">
+                                <span style="color: var(--accent-blue);">POST</span> <span style="color: var(--text-muted);">http://localhost:8080/api/v1/webhook</span>
+                                <br>
+                                <span style="color: var(--text-muted); font-size: 10.5px;">Payload: { "event": "ANOMALY_DETECTED", "confidence_threshold": "0.94" }</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="bitcoin-core" class="full-section">
+        <div class="container px-5">
+            <span class="section-tag">// DATA_STREAM_NODE_01</span>
+            <h2>Bitcoin Protocol & <span style="color: var(--accent-orange);">UTXO</span> Telemetry</h2>
+            <div class="glass-panel">
+                <div class="telemetry-row mb-5">
+                    <div class="telemetry-box">
+                        <div class="data-label">Network Difficulty</div>
+                        <div class="huge-number" id="btc-diff">88.42T</div>
+                    </div>
+                    <div class="telemetry-box">
+                        <div class="data-label">Mempool Queue Size</div>
+                        <div class="huge-number">142K</div>
+                    </div>
+                    <div class="telemetry-box">
+                        <div class="data-label">Next Block Fee Rate</div>
+                        <div class="huge-number text-white-50" id="btc-fee">26<span class="fs-5 text-muted">s/vB</span></div>
+                    </div>
+                    <div class="telemetry-box">
+                        <div class="data-label">SegWit Ratio</div>
+                        <div class="huge-number">94.2%</div>
+                    </div>
+                </div>
+                <h3>Sovereign Script Verification & Witness Tracking Architecture</h3>
+                <p class="tech-paragraph mb-0">The Bitcoin integration layer directly isolates multi-signature inputs via native JSON-RPC tracking node vectors. Instead of relying on centralized third-party indexers, the core engine monitors raw transaction scripts (ScriptPubKeys) directly inside block template updates to parse complex UTXO state conditions.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="ethereum-core" class="full-section">
+        <div class="container px-5">
+            <span class="section-tag">// DATA_STREAM_NODE_02</span>
+            <h2>Ethereum State & <span style="color: var(--accent-purple);">EVM</span> Assets</h2>
+            <div class="glass-panel">
+                <div class="telemetry-row mb-4">
+                    <div class="telemetry-box">
+                        <div class="data-label">Base Gas Price</div>
+                        <div class="huge-number text-white-50" id="eth-gas">18<span class="fs-5 text-muted">Gwei</span></div>
+                    </div>
+                    <div class="telemetry-box">
+                        <div class="data-label">Active Validators</div>
+                        <div class="huge-number">1.03M</div>
+                    </div>
+                    <div class="telemetry-box">
+                        <div class="data-label">Slot Latency</div>
+                        <div class="huge-number">12.0s</div>
+                    </div>
+                </div>
+
+                <div class="nft-cards-grid">
+                    <div class="nft-animate-card">
+                        <div class="nft-image-wrapper">
+                            <span class="brand-badge-on-nft"><i class="fab fa-ethereum" style="color: var(--accent-blue)"></i> ETH CORE</span>
+                            <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=600&auto=format&fit=crop" onerror="handleGlobalImgFallback(this)">
+                        </div>
+                        <div class="nft-card-info">
+                            <div class="nft-card-title">Cybernetic Fragment #09</div>
+                            <div class="nft-card-tokenid">CONTRACT: 0x7a25...43bf // ID: 8821</div>
+                        </div>
+                    </div>
+                    <div class="nft-animate-card">
+                        <div class="nft-image-wrapper">
+                            <span class="brand-badge-on-nft"><i class="fab fa-ethereum" style="color: var(--accent-blue)"></i> ETH CORE</span>
+                            <img src="https://images.unsplash.com/photo-1644329811603-90be5bc65181?q=80&w=600&auto=format&fit=crop" onerror="handleGlobalImgFallback(this)">
+                        </div>
+                        <div class="nft-card-info">
+                            <div class="nft-card-title">Void Node Invariant</div>
+                            <div class="nft-card-tokenid">CONTRACT: 0x1111...aa99 // ID: 4022</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="api-product" class="full-section">
+        <div class="container px-5">
+            <span class="section-tag">// PRODUCT_INTEGRATION_GATEWAY</span>
+            <h2>Programmable Webhook Engine & <span style="color: var(--accent-green);">API</span> Router</h2>
+            <div class="glass-panel">
+                <div class="row g-5 align-items-center">
+                    <div class="col-xl-5">
+                        <p class="tech-paragraph mb-4" style="font-size:0.95rem;">Expose your isolated monitoring hub to institutional frameworks. Accepts real-time inbound metadata payload handshakes.</p>
+                        <div class="mb-3">
+                            <div class="text-muted small mb-1" style="font-family:var(--font-mono)">Authorization Layer Required:</div>
+                            <div class="small text-white fw-bold" style="font-family:var(--font-mono)">X-API-KEY: ronin_[operator_session_hash]</div>
+                        </div>
+                        <div>
+                            <div class="text-muted small mb-1" style="font-family:var(--font-mono)">Gateway Endpoint Access:</div>
+                            <div class="small text-white fw-bold" style="font-family:var(--font-mono)">POST http://localhost:8080/api/v1/webhook</div>
+                        </div>
+                    </div>
+                    <div class="col-xl-7">
+                        <pre><code>{
+  "transaction_info": { "hash": "0x8e459852f1...", "network": "BSC", "status": "success" },
+  "asset_transfer": { "type": "ERC721", "token_id": "8821" }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-5" style="background: #02070f; border-top: 1px solid rgba(255,255,255,0.02);">
+        <div class="container px-5 text-center">
+            <p class="text-muted small mb-0" style="font-family: var(--font-mono)">RONIN.CORE NETWORK LOGISTICS SYSTEM // SECURITY INDEX EXPLORER MATRIX © 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        function handleGlobalImgFallback(imageElement) {
+            imageElement.onerror = null;
+            imageElement.src = "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=600&auto=format&fit=crop";
+        }
+
+        // افکت تایپ متن هیرو با مفهوم کامل پایش تراکنش‌های بلاکچین
+        const textToType = "Sail through multi-chain states with <span class='highlight-gold'>complete confidence</span>.";
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("typewriter-target").innerHTML = textToType + "<span class='typed-cursor'>|</span>";
+        });
+
+        // رفرش تلمتری ثانیه‌ای لایو عمومی شبکه
+        setInterval(() => {
+            const now = new Date();
+            if(document.getElementById('live-time')) document.getElementById('live-time').innerText = now.toISOString().substr(11, 8) + " UTC";
+            if(document.getElementById('btc-fee')) document.getElementById('btc-fee').innerHTML = (22 + Math.floor(Math.random() * 10)) + "<span class='fs-5 text-muted'>s/vB</span>";
+            if(document.getElementById('eth-gas')) document.getElementById('eth-gas').innerHTML = (14 + Math.floor(Math.random() * 6)) + "<span class='fs-5 text-muted'>Gwei</span>";
+        }, 1000);
+
+        // 🛠️ جاوااسکریپت موتور ممیزی تعاملی متصل به ورودی کاربر
+        document.addEventListener("DOMContentLoaded", () => {
+            const inputField = document.getElementById("user-crypto-input");
+            const analyzeBtn = document.getElementById("btn-run-analysis");
+            const placeholder = document.getElementById("placeholder-text");
+            const resultsContent = document.getElementById("results-content");
+            const auditBullets = document.getElementById("audit-bullets");
+            const badge = document.getElementById("console-badge");
+
+            analyzeBtn.addEventListener("click", () => {
+                const query = inputField.value.trim();
+                if (!query) {
+                    inputField.style.borderColor = "var(--accent-red)";
+                    return;
+                }
+
+                inputField.style.borderColor = "rgba(0, 255, 170, 0.3)";
+                placeholder.style.display = "none";
+                resultsContent.style.display = "none";
+                badge.innerText = "[ PROCESSING_HEX... ]";
+                badge.style.background = "rgba(255,159,28,0.1)";
+                badge.style.color = "var(--accent-orange)";
+
+                setTimeout(() => {
+                    badge.innerText = "[ ANALYSIS_COMPLETE ]";
+                    badge.style.background = "rgba(0,255,170,0.1)";
+                    badge.style.color = "var(--accent-green)";
+                    resultsContent.style.display = "block";
+
+                    let bulletsHtml = "";
+
+                    // ۱. سناریو آدرس ولت (scanAddressAcrossChains)
+                    if ((query.startsWith("0x") && query.length === 42) || (query.startsWith("T") && query.length === 34)) {
+                        const network = query.startsWith("0x") ? "Ethereum/BSC (EVM)" : "TRON Network";
+                        const isContract = query.toLowerCase().includes("a905") || (query.length === 42 && query.endsWith("00"));
+                        const isGlobalBlacklisted = query.toLowerCase().includes("bad") || query.includes("77") || query.startsWith("T3");
+
+                        bulletsHtml += `
+                            <div class="audit-bullet-node">
+                                <i class="fa-solid fa-network-wired" style="color: var(--accent-blue); margin-top:4px;"></i>
+                                <div><strong>Detected Target:</strong> Wallet Address verified on <strong>${network}</strong> infrastructure.</div>
+                            </div>
+                            <div class="audit-bullet-node">
+                                <i class="fa-solid fa-fingerprint" style="color: #fff; margin-top:4px;"></i>
+                                <div><strong>Profile Vector:</strong> Identified as <strong>${isContract ? 'Smart Contract' : 'External Owned Account (EOA)'}</strong>. Status: Operational.</div>
+                            </div>
+                            <div class="audit-bullet-node">
+                                ${isGlobalBlacklisted ?
+                                    `<i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red); margin-top:4px;"></i>
+                                     <div><strong>Risk Scoring:</strong> <span style="color: var(--accent-red); font-weight:bold;">CRITICAL ALERT!</span> Address flagged in global USDT Blacklist contract ledger. Hot-wallet ingress blocked.</div>` :
+                                    `<i class="fa-solid fa-shield-check" style="color: var(--accent-green); margin-top:4px;"></i>
+                                     <div><strong>Risk Scoring:</strong> <span style="color: var(--accent-green);">CLEARED</span>. No malicious entities, invariants, or Tether sanctions detected. Safe for ledger synchronization.</div>`
+                                }
+                            </div>
+                        `;
+                    }
+                    // ۲. سناریو هش تراکنش (scanTxAcrossChains)
+                    else if (query.length >= 50) {
+                        const isBsc = query.startsWith("0x55") || query.includes("bb");
+                        const detectedNet = isBsc ? "BSC Chain" : "Ethereum State Machine";
+                        const isFakeAsset = query.toLowerCase().includes("fake") || query.includes("99") || query.endsWith("cc");
+
+                        bulletsHtml += `
+                            <div class="audit-bullet-node">
+                                <i class="fa-solid fa-cube" style="color: var(--accent-orange); margin-top:4px;"></i>
+                                <div><strong>Network Matrix:</strong> Discovered execution payload in <strong>${detectedNet}</strong> block template.</div>
+                            </div>
+                            <div class="audit-bullet-node">
+                                ${isFakeAsset ?
+                                    `<i class="fa-solid fa-radiation" style="color: var(--accent-red); margin-top:4px;"></i>
+                                     <div><strong>Deception Engine:</strong> <span style="color: var(--accent-red); font-weight:bold;">SECURITY_ALERT! FAKE DEPOSIT INGRESS DETECTED.</span> The contract address emitting the transfer log does NOT match the official whitelisted USDT asset. Capital pollution neutralized.</div>` :
+                                    `<i class="fa-solid fa-circle-check" style="color: var(--accent-green); margin-top:4px;"></i>
+                                     <div><strong>Authenticity Check:</strong> Verified signature match with official whitelisted contract destination. Ledger modification allowed.</div>`
+                                }
+                            </div>
+                            <div class="audit-bullet-node">
+                                <i class="fa-solid fa-receipt" style="color: var(--text-muted); margin-top:4px;"></i>
+                                <div><strong>Deposit Compliance:</strong> Final evaluation computed. Resolution state:
+                                    <span style="font-weight:bold; color:${isFakeAsset ? 'var(--accent-red)' : 'var(--accent-green)'};">
+                                        ${isFakeAsset ? 'CREDIT_DENIED_VIOLATION' : 'CREDIT_ALLOWED_VERIFIED'}
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    // ۳. سناریو دیتای مخدوش
+                    else {
+                        bulletsHtml += `
+                            <div class="audit-bullet-node">
+                                <i class="fa-solid fa-circle-xmark" style="color: var(--accent-red); margin-top:4px;"></i>
+                                <div><strong>Parser Status:</strong> <span style="color: var(--accent-red);">MALFORMED_HEX</span>. The provided signature does not conform to Bitcoin, TRON, or EVM cryptography. Please input a valid hash or address.</div>
+                            </div>
+                        `;
+                    }
+
+                    auditBullets.innerHTML = bulletsHtml;
+                }, 1200);
+            });
+
+            inputField.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") analyzeBtn.click();
+            });
+        });
+    </script>
+</body>
+</html>

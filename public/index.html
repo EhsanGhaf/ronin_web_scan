@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ronin Core - Secure Network Portal</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+    <style>
+        :root {
+            --bg-deep-sea: #050d1a;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #0b1a30 0%, #040a14 100%);
+            --glass-bg: rgba(6, 17, 33, 0.7);
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --text-muted: #6b7c96;
+
+            /* نئون آکسنت‌های هماهنگ با لندینگ پیج اصلی */
+            --accent-green: #00ffaa;
+            --accent-blue: #00bbf9;
+            --accent-red: #ff3366;
+            --accent-gold: #e0aa3e;
+        }
+
+        body {
+            background: var(--bg-deep-sea);
+            background-image: var(--bg-gradient);
+            color: #ffffff;
+            font-family: var(--font-sans);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* خطوط لوپ پس‌زمینه ماتریکس شبکه */
+        body::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 60px 60px; pointer-events: none; z-index: 0;
+        }
+
+        /* پورتال دسکتاپ لوکس شیشه‌ای با مرز نئونی */
+        .auth-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(0, 255, 170, 0.15);
+            border-radius: 16px;
+            padding: 45px;
+            width: 100%;
+            max-width: 460px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 255, 170, 0.03);
+            overflow: hidden;
+        }
+
+        /* افکت خط پالس متحرک بالای کار لاگین */
+        .auth-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            animation: topGlowMove 3s linear infinite;
+        }
+        @keyframes topGlowMove { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        .brand {
+            font-family: var(--font-sans);
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-align: center;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+        .brand span { color: var(--accent-green); }
+        .brand i { color: #fff; margin-right: 4px; }
+
+        .portal-subtitle {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+
+        /* بازطراحی فیلدهای ورودی به سبک سایبرپانک لوکس */
+        .input-raw {
+            background: rgba(4, 13, 26, 0.8) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 6px !important;
+            color: #ffffff !important;
+            padding: 13px 16px !important;
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            outline: none !important;
+            transition: all 0.25s ease !important;
+        }
+        .input-raw::placeholder { color: rgba(255, 255, 255, 0.3) !important; }
+        .input-raw:focus {
+            border-color: var(--accent-green) !important;
+            box-shadow: 0 0 12px rgba(0, 255, 170, 0.15) !important;
+            background: rgba(6, 22, 44, 0.9) !important;
+        }
+
+        /* دکمه پردازش با تایید نئون */
+        .btn-raw {
+            background: #ffffff;
+            border: none;
+            color: #040a14;
+            font-weight: 700;
+            border-radius: 6px;
+            padding: 14px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            font-family: var(--font-mono);
+            transition: all 0.2s ease;
+        }
+        .btn-raw:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-toggle {
+            cursor: pointer;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .auth-toggle:hover { color: #00d48f; text-decoration: underline; }
+
+        /* لودینگ پیشرفته در حال اتصال نود */
+        .loading-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(4, 11, 22, 0.9);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 20; border-radius: 16px;
+            backdrop-filter: blur(5px);
+        }
+
+        #auth-alert {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            background: rgba(255, 51, 102, 0.05) !important;
+            border: 1px solid rgba(255, 51, 102, 0.15) !important;
+            color: var(--accent-red) !important;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        /* تگ امنیتی گوشه صفحه برای جلوه بصری ترمینال */
+        .security-footer-tag {
+            position: absolute; bottom: 15px; width: 100%; text-align: center;
+            font-family: var(--font-mono); font-size: 10px; color: rgba(255,255,255,0.2);
+            letter-spacing: 1px; pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <div id="local-loader" class="loading-overlay d-none">
+            <div class="text-center">
+                <i class="fa-solid fa-satellite-dish fa-spin mb-3" style="font-size:2rem; color:var(--accent-green);"></i>
+                <div class="text-white fw-bold small" style="font-family: var(--font-mono); letter-spacing: 1px;">CONNECTING_LOCAL_NODE...</div>
+                <div class="small mt-1" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 10px;">TRANSMITTING ENCRYPTED PORTAL DATA</div>
+            </div>
+        </div>
+
+        <div class="brand"><i class="fa-solid fa-shield-halved"></i> RONIN<span>.</span>CORE</div>
+        <div class="text-center portal-subtitle">Multi-Chain Security Ingress Portal</div>
+
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="mb-3">
+                <input type="text" id="login-user" class="form-control input-raw" placeholder="Terminal Username" required autocomplete="off">
+            </div>
+            <div class="mb-4">
+                <input type="password" id="login-pass" class="form-control input-raw" placeholder="Access Password" required>
+            </div>
+            <button type="submit" class="btn btn-raw mb-3">[ INITIALIZE_CONNECTION ]</button>
+            <div class="text-center small" style="color: var(--text-muted); font-size: 12px;">
+                Need local access node? <span class="auth-toggle" onclick="toggleAuth(true)">Register Operator</span>
+            </div>
+        </form>
+
+        <form id="register-form" onsubmit="handleRegister(event)" class="d-none">
+            <div class="mb-3">
+                <input type="text" id="reg-user" class="form-control input-raw" placeholder="Create Username" required autocomplete="off">
+            </div>
+            <div class="mb-3">
+                <input type="password" id="reg-pass" class="form-control input-raw" placeholder="Create Password" required>
+            </div>
+            <div class="mb-4">
+                <input type="text" id="reg-secret" class="form-control input-raw" placeholder="Secret Master Key (Required)" required autocomplete="off">
+            </div>
+            <button type="submit" class="btn btn-raw mb-3">[ PROVISION_ACCOUNT ]</button>
+            <div class="text-center small" style="color: var(--text-muted); font-size: 12px;">
+                Existing operator token? <span class="auth-toggle" onclick="toggleAuth(false)">Return to Login</span>
+            </div>
+        </form>
+
+        <div id="auth-alert" class="mt-3 alert d-none text-center py-2"></div>
+    </div>
+
+    <div class="security-footer-tag">
+        SECURE_AUTH_LAYER // END_TO_END_ENCRYPTED_SESSION_2026
+    </div>
+
+    <script>
+        const REQUIRED_KEY = "hs1ireZOvfdP7bL8x4fHWmM32wvP";
+
+        function toggleAuth(showRegister) {
+            document.getElementById('login-form').classList.toggle('d-none', showRegister);
+            document.getElementById('register-form').classList.toggle('d-none', !showRegister);
+            document.getElementById('auth-alert').classList.add('d-none');
+        }
+
+        function sanitizeInput(str) {
+            return str ? str.replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/g, "").trim() : "";
+        }
+
+        function setLoader(show) {
+            document.getElementById('local-loader').classList.toggle('d-none', !show);
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = sanitizeInput(document.getElementById('login-user').value);
+            const password = document.getElementById('login-pass').value;
+            const alertBox = document.getElementById('auth-alert');
+
+            alertBox.classList.add('d-none');
+            // ریست کردن استایل آلرت به حالت ارور پیش‌فرض در صورت تلاش مجدد
+            alertBox.style.background = "rgba(255, 51, 102, 0.05)";
+            alertBox.style.borderColor = "rgba(255, 51, 102, 0.15)";
+            alertBox.style.color = "var(--accent-red)";
+            setLoader(true);
+
+            try {
+                const res = await fetch('http://localhost:8080/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if(!res.ok) throw new Error(data.error || "Access Denied.");
+
+                localStorage.setItem('ronin_token', data.token);
+                localStorage.setItem('ronin_api_key', data.apiKey);
+                localStorage.setItem('ronin_user', username);
+                window.location.href = '/dashboard.html';
+            } catch(err) {
+                setLoader(false);
+                alertBox.innerText = `[✕] RESOLUTION_FAILURE: ${err.message}`;
+                alertBox.classList.remove('d-none');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const username = sanitizeInput(document.getElementById('reg-user').value);
+            const password = document.getElementById('reg-pass').value;
+            const secretKey = sanitizeInput(document.getElementById('reg-secret').value);
+            const alertBox = document.getElementById('auth-alert');
+
+            // ریست استایل به حالت ارور
+            alertBox.style.background = "rgba(255, 51, 102, 0.05)";
+            alertBox.style.borderColor = "rgba(255, 51, 102, 0.15)";
+            alertBox.style.color = "var(--accent-red)";
+
+            if (secretKey !== REQUIRED_KEY) {
+                alertBox.innerText = "[✕] CRITICAL FAILURE: Invalid Secret Master Key.";
+                alertBox.classList.remove('d-none');
+                return;
+            }
+
+            setLoader(true);
+            try {
+                const res = await fetch('http://localhost:8080/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, secret_key: secretKey })
+                });
+                const data = await res.json();
+                setLoader(false);
+
+                if(!res.ok) throw new Error(data.error || "Registration rejected.");
+
+                // تغییر استایل داینامیک باکس پیام موفقیت به سبز نئونی لوکس
+                alertBox.style.background = "rgba(0, 255, 170, 0.05)";
+                alertBox.style.borderColor = "rgba(0, 255, 170, 0.2)";
+                alertBox.style.color = "var(--accent-green)";
+                alertBox.innerText = "[✓] OPERATOR_NODE_PROVISIONED. REDIRECTING...";
+                alertBox.classList.remove('d-none');
+
+                setTimeout(() => {
+                    toggleAuth(false);
+                    document.getElementById('reg-secret').value = "";
+                }, 1500);
+            } catch(err) {
+                setLoader(false);
+                alertBox.innerText = `[✕] REGISTRATION_REJECTED: ${err.message}`;
+                alertBox.classList.remove('d-none');
+            }
+        }
+    </script>
+</body>
+</html>

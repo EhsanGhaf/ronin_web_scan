@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ronin Core Engine - Console</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Fira+Code:wght@400;500;700&display=swap">
+
+    <style>
+        :root {
+            --bg-main: #050d1a;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #0b1a30 0%, #040a14 100%);
+            --bg-sidebar: rgba(4, 11, 22, 0.85);
+            --glass-bg: rgba(6, 17, 33, 0.65);
+            --border-tech: rgba(255, 255, 255, 0.05);
+
+            /* نئون آکسنت‌های لوکس تیره بلاکچینی */
+            --accent-green: #00ffaa;
+            --tech-blue: #00bbf9;
+            --tech-orange: #ff9f1c;
+            --tech-red: #ff3366;
+            --accent-gold: #e0aa3e;
+
+            --text-main: #ffffff;
+            --text-muted: #6b7c96;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* اسکرول‌بار اختصاصی شبکه */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: #102542; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #1b3b6f; }
+
+        body {
+            background-color: var(--bg-main);
+            background-image: var(--bg-gradient);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* خطوط ماتریکسی ظریف پس‌زمینه */
+        body::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 80px 80px; pointer-events: none; z-index: 0;
+        }
+
+        /* سایدبار لوکس شیشه‌ای ملوانی */
+        .sidebar {
+            width: 270px;
+            background-color: var(--bg-sidebar);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-tech);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 25px 20px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            border-bottom: 1px solid var(--border-tech);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar-brand span { color: var(--accent-green); }
+        .sidebar-brand img { width: 22px; height: 22px; filter: grayscale(100%) brightness(200%); }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            padding: 14px 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .menu-item:hover { color: #fff; background: rgba(255, 255, 255, 0.02); }
+        .menu-item.active { border-left-color: var(--accent-green); background: rgba(0, 255, 170, 0.04); color: #fff; }
+
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-tech); font-size: 0.75rem; background: rgba(4, 11, 22, 0.4); font-family: var(--font-mono); }
+
+        /* پنجره اصلی محتوا */
+        .content-window { flex-grow: 1; height: 100%; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; position: relative; z-index: 1; }
+        .tab-content-panel { display: none; }
+        .tab-content-panel.active { display: block; }
+
+        .panel-header { border-bottom: 1px solid var(--border-tech); padding-bottom: 15px; margin-bottom: 30px; }
+        .panel-header h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; margin: 0; color: #fff; }
+
+        /* پنل شیشه‌ای ارتقا یافته */
+        .card-flat {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-tech);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+        .card-flat h5 { font-family: var(--font-sans); font-size: 0.95rem; font-weight: 700; text-transform: uppercase; margin-bottom: 18px; letter-spacing: 0.5px; color: #fff; display: flex; align-items: center; }
+
+        /* فیلدهای ورودی سایبرپانکی لوکس */
+        .input-raw {
+            background: rgba(4, 13, 26, 0.8) !important;
+            border: 1px solid rgba(0, 255, 170, 0.25) !important;
+            border-radius: 6px !important;
+            color: #ffffff !important;
+            font-family: var(--font-mono);
+            padding: 13px 16px !important;
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+        .input-raw:focus { border-color: var(--accent-green) !important; box-shadow: 0 0 12px rgba(0, 255, 170, 0.15) !important; background: rgba(6, 22, 44, 0.9) !important; }
+        select.input-raw option { background: #061121; color: #fff; }
+
+        /* دکمه پردازش نئونی */
+        .btn-raw {
+            background: #ffffff; border: none; color: #040a14; font-weight: 700; border-radius: 6px; padding: 13px 24px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; font-family: var(--font-mono); transition: all 0.2s ease;
+        }
+        .btn-raw:hover { background: #f1f5f9; transform: translateY(-1px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); }
+
+        pre { background: #030912 !important; border: 1px solid var(--border-tech); color: var(--accent-green) !important; padding: 20px; border-radius: 8px; max-height: 450px; overflow-y: auto; font-size: 12.5px; font-family: var(--font-mono); }
+
+        /* جداول شبکه داده */
+        .table-raw { width: 100%; border-collapse: collapse; font-size: 0.82rem; font-family: var(--font-mono); }
+        .table-raw th { background: rgba(4, 11, 22, 0.5); color: var(--text-muted); text-transform: uppercase; font-size: 0.72rem; padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border-tech); font-weight: 700; letter-spacing: 0.5px; }
+        .table-raw td { padding: 14px 12px; border-bottom: 1px solid var(--border-tech); color: #cbd5e1; text-align: left; vertical-align: middle; }
+        .table-raw tr:hover { background: rgba(255, 255, 255, 0.01); }
+
+        .sub-badge { background: rgba(0, 187, 249, 0.06); padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; border: 1px solid rgba(0, 187, 249, 0.15); font-family: var(--font-mono); }
+        .human-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.88rem; }
+        .human-row:last-child { border: none; }
+
+        .doc-pre { font-family: 'Fira Code', monospace !important; font-size: 11.5px; background: #030912 !important; border-left: 3px solid var(--tech-blue); direction: ltr; text-align: left; }
+        .doc-pill-btn { background: rgba(255,255,255,0.02); color: var(--text-muted); border: 1px solid var(--border-tech); font-size: 0.75rem; padding: 6px 14px; border-radius: 4px; transition: all 0.2s; cursor: pointer; font-family: var(--font-mono); }
+        .doc-pill-btn:hover { color: #fff; }
+        .doc-pill-btn.active { background: rgba(0, 255, 170, 0.1); border-color: var(--accent-green); color: var(--accent-green); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <div class="sidebar-brand">
+                <img src="favicon.png" alt="logo">
+                RONIN<span>.</span>CORE
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" onclick="switchTab('tab-console', this)"><i class="fa-solid fa-terminal"></i> Console Scan</li>
+                <li class="menu-item" onclick="switchTab('tab-whitelist', this)"><i class="fa-solid fa-shield-halved"></i> Whitelist Manager</li>
+                <li class="menu-item" onclick="switchTab('tab-deposit-rules', this)"><i class="fa-solid fa-money-bill-transfer"></i> Deposit Limits</li>
+                <li class="menu-item" onclick="switchTab('tab-history', this)"><i class="fa-solid fa-database"></i> Database Logs</li>
+                <li class="menu-item" onclick="switchTab('tab-docs', this)"><i class="fa-solid fa-code"></i> API Integration Docs</li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            <div class="text-muted mb-1">// NODE OPERATOR RUNNING</div>
+            <div class="text-white mb-3" id="user-display" style="font-weight: 700; letter-spacing: 0.5px;">---</div>
+            <div class="text-danger" style="cursor:pointer; font-weight:700; font-size: 0.7rem; letter-spacing: 0.5px;" onclick="logout()">[ TERMINATE_SESSION ]</div>
+        </div>
+    </div>
+
+    <div class="content-window">
+
+        <div id="tab-console" class="tab-content-panel active">
+            <div class="panel-header"><h2>CORE EXECUTOR CONSOLE</h2></div>
+            <div class="card-flat">
+                <div class="row g-2">
+                    <div class="col-md-10">
+                        <input type="text" id="search-input" class="form-control input-raw" placeholder="Inject Tx Hash or Smart Contract Wallet Address...">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-raw w-100" onclick="executeScan()">EXECUTE</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="result-box" class="d-none">
+                <div class="row g-4">
+                    <div class="col-md-5">
+                        <div class="card-flat" style="height: 100%; margin-bottom: 0;">
+                            <h5><i class="fa-solid fa-circle-info me-2 text-info"></i>Human Interpretation</h5>
+                            <div id="human-summary-panel" class="pt-2"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card-flat" style="height: 100%; margin-bottom: 0;">
+                            <h5><i class="fa-solid fa-code me-2 text-success"></i>Raw Telemetry Logs</h5>
+                            <pre id="json-output" style="margin-bottom: 0;"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-whitelist" class="tab-content-panel">
+            <div class="panel-header"><h2>OFFICIAL ASSET WHITELIST</h2></div>
+            <div class="card-flat">
+                <h5>Add Approved Token Contract</h5>
+                <form id="whitelist-form" onsubmit="addWhitelistToken(event)" class="row g-2 align-items-end">
+                    <div class="col-md-3">
+                        <label class="text-muted small mb-1" style="font-family: var(--font-mono); font-size: 11px;">Network</label>
+                        <select id="w-network" class="form-control input-raw" required>
+                            <option value="Ethereum">Ethereum</option>
+                            <option value="BSC">BSC</option>
+                            <option value="Polygon">Polygon</option>
+                            <option value="TRON">TRON</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="text-muted small mb-1" style="font-family: var(--font-mono); font-size: 11px;">Token Symbol</label>
+                        <input type="text" id="w-symbol" class="form-control input-raw" placeholder="e.g. USDT" required autocomplete="off">
+                    </div>
+                    <div class="col-md-5">
+                        <label class="text-muted small mb-1" style="font-family: var(--font-mono); font-size: 11px;">Official Smart Contract Address</label>
+                        <input type="text" id="w-address" class="form-control input-raw font-monospace" placeholder="0x... or Tron Address" required autocomplete="off">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-raw w-100">WHITELIST</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-flat">
+                <h5>Whitelisted Assets Registry</h5>
+                <table class="table-raw" id="table-whitelist">
+                    <thead>
+                        <tr>
+                            <th>Network</th>
+                            <th>Symbol</th>
+                            <th>Contract Address</th>
+                            <th>Date Added</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="whitelist-table-body">
+                        <tr><td colspan="5" class="text-muted">Fetching registry dockets...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-deposit-rules" class="tab-content-panel">
+            <div class="panel-header"><h2>EXCHANGE DEPOSIT COMPLIANCE RULES</h2></div>
+            <div class="card-flat">
+                <h5>Define Minimum Ingress Limits</h5>
+                <form id="deposit-rules-form" onsubmit="addDepositRule(event)" class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="text-muted small mb-1" style="font-family: var(--font-mono); font-size: 11px;">Target Network (Type Name)</label>
+                        <input type="text" id="dr-network" class="form-control input-raw" placeholder="e.g. BITCOIN, BSC, TRON, ETH" required autocomplete="off">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="text-muted small mb-1" style="font-family: var(--font-mono); font-size: 11px;">Token Symbol</label>
+                        <input type="text" id="dr-symbol" class="form-control input-raw" placeholder="e.g. BTC, USDT, TRX" required autocomplete="off">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="text-muted small mb-1" style="font-family: var(--font-mono); font-size: 11px;">Minimum Deposit Amount</label>
+                        <input type="number" step="any" id="dr-min-deposit" class="form-control input-raw" placeholder="e.g. 10.0" required autocomplete="off">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-raw w-100">SAVE RULE</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-flat">
+                <h5>Active Limits Registry</h5>
+                <table class="table-raw" id="table-rules">
+                    <thead>
+                        <tr>
+                            <th>Network</th>
+                            <th>Asset Symbol</th>
+                            <th>Minimum Required Limit</th>
+                            <th>System Live Since</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dr-table-body">
+                        <tr><td colspan="5" class="text-muted">Loading ingress dockets...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-history" class="tab-content-panel">
+            <div class="panel-header"><h2>SQLITE PERSISTENT LOGS</h2></div>
+            <div class="card-flat">
+                <table class="table-raw">
+                    <thead>
+                        <tr>
+                            <th>Search Query Target</th>
+                            <th>Query Type</th>
+                            <th>Detected Network</th>
+                            <th>Request Source</th>
+                            <th>Response Status</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body">
+                        <tr><td colspan="6" class="text-muted">Loading logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-docs" class="tab-content-panel">
+            <div class="panel-header"><h2>API INTEGRATION COMPLIANCE</h2></div>
+
+            <div class="card-flat">
+                <h5>Operator Authorization Header</h5>
+                <input type="text" id="api-key-display" class="form-control input-raw text-white mb-4" readonly style="color: var(--accent-green) !important; font-weight: bold; background: #030912 !important; border-color: rgba(0,255,170,0.15) !important; box-shadow: inset 0 0 10px rgba(0,255,170,0.02);">
+
+                <div class="row g-4 mt-2">
+                    <div class="col-md-6">
+                        <h5 class="small text-muted text-uppercase mb-3">HTTP REQUEST STRUCTURE (POST Gateway)</h5>
+                        <div class="p-3 mb-3 rounded text-start" style="direction:ltr; background: #030912; border: 1px solid var(--border-tech);">
+                            <span class="badge bg-danger me-2" style="font-family: var(--font-mono); font-size: 10px; padding: 5px 8px;">POST</span><code class="text-info" style="font-size:13px; font-family: var(--font-mono)">http://localhost:8080/api/v1/webhook</code>
+                        </div>
+
+                        <div class="d-flex gap-2 mb-2 font-monospace" style="direction: ltr;">
+                            <button class="doc-pill-btn active" id="btn-snip-curl" onclick="switchSnippet('curl')">cURL</button>
+                            <button class="doc-pill-btn" id="btn-snip-js" onclick="switchSnippet('js')">Node.js</button>
+                            <button class="doc-pill-btn" id="btn-snip-py" onclick="switchSnippet('py')">Python</button>
+                        </div>
+
+                        <div id="snip-curl" class="doc-snippet-view">
+                            <pre class="doc-pre"><span style="color: #ff3366;">curl</span> -X POST http://localhost:8080/api/v1/webhook \
+  -H <span style="color: #00bbf9;">"X-API-KEY: your_api_key_here"</span> \
+  -H <span style="color: #00bbf9;">"Content-Type: application/json"</span> \
+  -d <span style="color: #ff9f1c;">'{"tx_hash": "64_CHAR_HEX_SIGNATURE"}'</span></pre>
+                        </div>
+                        <div id="snip-js" class="doc-snippet-view d-none">
+                            <pre class="doc-pre"><span style="color: #ff3366;">const</span> response = <span style="color: #ff3366;">await</span> <span style="color: #00bbf9;">fetch</span>(<span style="color: #ff9f1c;">'http://localhost:8080/api/v1/webhook'</span>, {
+    method: <span style="color: #ff9f1c;">'POST'</span>,
+    headers: { <span style="color: #00bbf9;">'X-API-KEY'</span>: <span style="color: #ff9f1c;">'API_KEY'</span>, <span style="color: #00bbf9;">'Content-Type'</span>: <span style="color: #ff9f1c;">'application/json'</span> },
+    body: <span style="color: #00bbf9;">JSON</span>.<span style="color: #ff9f1c;">stringify</span>({ tx_hash: <span style="color: #ff9f1c;">'HASH'</span> })
+});</pre>
+                        </div>
+                        <div id="snip-py" class="doc-snippet-view d-none">
+                            <pre class="doc-pre"><span style="color: #ff3366;">import</span> requests
+headers = {<span style="color: #00bbf9;">"X-API-KEY"</span>: <span style="color: #ff9f1c("KEY"</span>, <span style="color: #00bbf9;">"Content-Type"</span>: <span style="color: #ff9f1c;">"json"</span>}
+res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span style="color: #00bbf9;">"tx_hash"</span>: <span style="color: #ff9f1c;">"HASH"</span>}, headers=headers)</pre>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h5 class="small text-muted text-uppercase mb-3">PIPELINE RESPONSE BLUEPRINTS (JSON)</h5>
+                        <div class="d-flex gap-2 mb-2 font-monospace" style="direction: ltr;">
+                            <button class="doc-pill-btn active" id="btn-show-tx-blueprint" onclick="toggleBlueprintOutput('tx')">Transaction Response</button>
+                            <button class="doc-pill-btn" id="btn-show-addr-blueprint" onclick="toggleBlueprintOutput('addr')">Address Response</button>
+                        </div>
+                        <pre id="doc-blueprint-viewer" class="doc-pre" style="max-height: 380px; overflow-y: auto; color:#cbd5e1 !important; border-left-color: var(--tech-orange);"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const txDocString = `{\n  "transaction_info": {\n    "hash": "0x8e459852f1033e9554b13625b74c44554962af1db0ed642b1c7c65a3093715e4",\n    "network": "BSC",\n    "status": "success",\n    "block_height": 99277233,\n    "timestamp": "2026-05-19T23:07:40.667Z",\n    "confirmations": 12\n  },\n  "address_details": {\n    "from": "0xe0f0aa98b4a4d305ac4a04d830c96a158bda9cd8",\n    "to": "0x1037fab1334c57483ce6c411ae7345050750d0bd",\n    "is_to_contract": true\n  },\n  "asset_transfer": {\n    "type": "ERC20",\n    "token_name": "Tether USD",\n    "token_symbol": "USDT",\n    "contract_address": "0x55d398326f99059ff775485246999027b3197955",\n    "amount": "291.9865",\n    "raw_value": "291986500000000000000",\n    "decimals": 18\n  },\n  "metadata": {\n    "memo": null,\n    "memo_type": null,\n    "method_id": "0xa9059cbb",\n    "method_name": "Token Transfer"\n  },\n  "authenticity_check": {\n    "status": "UNKNOWN",\n    "details": "Asset not tracked in official local whitelist."\n  },\n  "deposit_compliance": {\n    "is_valid_deposit": false,\n    "exchange_minimum_required": 0,\n    "user_deposited_amount": 291.9865,\n    "status": "SECURITY_ALERT_FAILED"\n  },\n  "financials": {\n    "fee_native": "0.0012",\n    "fee_usd": "0.00",\n    "gas_price_gwei": 0\n  }\n}`;
+
+        const addrDocString = `{\n  "address_profile": {\n    "address": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",\n    "address_type": "eoa",\n    "last_active": "2026-05-19T23:44:01Z"\n  },\n  "balances": {\n    "native_balance": "42.1584 ETH",\n    "native_balance_usd": "148350.20"\n  },\n  "risk_scoring": {\n    "is_flagged": false,\n    "risk_level": "low",\n    "tags": ["Active DeFi Whale"]\n  }\n}`;
+
+        const token = localStorage.getItem('ronin_token');
+        const apiKey = localStorage.getItem('ronin_api_key');
+        if (!token) window.location.href = '/';
+
+        document.getElementById('user-display').innerText = (localStorage.getItem('ronin_user') || 'OP').toUpperCase();
+        document.getElementById('api-key-display').value = apiKey;
+
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            element.classList.add('active');
+
+            if (tabId === 'tab-history') loadHistoryData();
+            if (tabId === 'tab-whitelist') loadWhitelistData();
+            if (tabId === 'tab-deposit-rules') loadDepositRulesData();
+            if (tabId === 'tab-docs') toggleBlueprintOutput('tx');
+        }
+
+        function switchSnippet(type) {
+            document.querySelectorAll('.doc-snippet-view').forEach(el => el.classList.add('d-none'));
+            document.querySelectorAll('.doc-pill-btn').forEach(btn => { if(btn.id.startsWith('btn-snip')) btn.classList.remove('active'); });
+            document.getElementById(`snip-${type}`).classList.remove('d-none');
+            document.getElementById(`btn-snip-${type}`).classList.add('active');
+        }
+
+        function toggleBlueprintOutput(mode) {
+            const viewer = document.getElementById('doc-blueprint-viewer');
+            const btnTx = document.getElementById('btn-show-tx-blueprint');
+            const btnAddr = document.getElementById('btn-show-addr-blueprint');
+            if(mode === 'tx') {
+                btnTx.classList.add('active'); btnAddr.classList.remove('active'); viewer.innerText = txDocString;
+            } else {
+                btnAddr.classList.add('active'); btnTx.classList.remove('active'); viewer.innerText = addrDocString;
+            }
+        }
+
+        async function executeScan() {
+            const input = document.getElementById('search-input').value.trim();
+            if(!input) return;
+
+            const resultBox = document.getElementById('result-box');
+            const jsonOutput = document.getElementById('json-output');
+            const humanPanel = document.getElementById('human-summary-panel');
+
+            resultBox.classList.remove('d-none');
+            jsonOutput.innerText = "Querying live blockchain ledger pipelines...";
+            humanPanel.innerHTML = '<div class="text-muted small"><i class="fa-solid fa-sync fa-spin me-2" style="color:var(--accent-green)"></i>Compiling block telemetry data...</div>';
+
+            const bodyData = (input.length === 34 || input.length === 42 || input.length === 44 || input.length === 48)
+                ? { address: input, source: "web_console" }
+                : { tx_hash: input, source: "web_console" };
+
+            try {
+                const res = await fetch('http://localhost:8080/api/v1/webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
+                    body: JSON.stringify(bodyData)
+                });
+                const data = await res.json();
+                jsonOutput.innerText = JSON.stringify(data, null, 2);
+                humanPanel.innerHTML = '';
+
+                if (data.address_profile) {
+                    humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Target Entity:</span><strong>Wallet Address</strong></div>`;
+                    humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Type:</span><strong class="text-info">${data.address_profile.address_type.toUpperCase()}</strong></div>`;
+                    humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Balance:</span><strong class="text-warning">${data.balances.native_balance}</strong></div>`;
+                    if(data.risk_scoring) {
+                        humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Risk Profiling:</span><span class="sub-badge" style="color:var(--accent-green); border-color:rgba(0,255,170,0.2); background:rgba(0,255,170,0.02)">${data.risk_scoring.tags[0]}</span></div>`;
+                    }
+                } else if (data.transaction_info) {
+                    const tx = data.transaction_info;
+                    const asset = data.asset_transfer;
+                    const auth = data.authenticity_check;
+                    const comp = data.deposit_compliance;
+                    const meta = data.metadata;
+
+                    humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Target Entity:</span><span class="sub-badge text-white" style="border-color:rgba(255,255,255,0.15)">Transaction</span></div>`;
+                    humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Network Tracker:</span><strong class="text-info font-monospace">${tx.network}</strong></div>`;
+                    humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Datalayer Status:</span><span style="color:${tx.status === 'success' ? 'var(--accent-green)' : 'var(--tech-red)'}"><i class="fa-solid ${tx.status === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'} me-1"></i>${tx.status.toUpperCase()}</span></div>`;
+                    humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Asset Ingress:</span><strong class="text-warning" style="font-size:1.05rem;">${asset.amount} ${asset.token_symbol}</strong></div>`;
+
+                    if (asset.contract_address) {
+                        humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Contract Token:</span><span class="text-white-50 font-monospace small text-truncate" style="max-width:170px;" title="${asset.contract_address}">${asset.contract_address}</span></div>`;
+                    }
+
+                    humanPanel.innerHTML += `<hr style="border-color: var(--border-tech); margin: 15px 0;">`;
+
+                    // ۱. ماژول بررسی وایت‌لیست
+                    let authColor, authBg, authText, authDesc;
+                    if (auth && auth.status === 'VERIFIED') {
+                        authColor = 'var(--accent-green)'; authBg = 'rgba(0,255,170,0.04)';
+                        authText = '[✓] WHITELIST APPROVED'; authDesc = auth.details;
+                    } else if (auth && auth.status === 'UNKNOWN') {
+                        authColor = 'var(--tech-orange)'; authBg = 'rgba(255,159,28,0.04)';
+                        authText = '[!] UNVERIFIED ASSET GATEWAY'; authDesc = auth.details;
+                    } else {
+                        authColor = 'var(--tech-red)'; authBg = 'rgba(255,51,102,0.06)';
+                        authText = '[✕] SECURITY ALERT: FAKE TOKEN'; authDesc = auth.details;
+                    }
+
+                    humanPanel.innerHTML += `
+                        <div class="p-2 mb-2 rounded font-monospace border" style="background:${authBg}; border-color: ${authColor}; color:${authColor}; font-size:11.5px; direction:ltr; text-align:left;">
+                            <div class="fw-bold mb-1"><i class="fa-solid fa-shield-halved me-1"></i>${authText}</div>
+                            <div style="font-size:10.5px; color:#fff; opacity:0.8;">${authDesc}</div>
+                        </div>`;
+
+                    // ۲. ماژول بررسی سقف حدعقل واریز
+                    let limitColor, limitBg, limitText, limitDesc;
+                    if (comp && comp.status.includes('UNDER_MINIMUM_REQUIRED')) {
+                        limitColor = 'var(--tech-orange)'; limitBg = 'rgba(255,159,28,0.04)';
+                        limitText = '[!] COMPLIANCE WARNING: LIMIT UNDERFLOW';
+                        limitDesc = `User sent ${comp.user_deposited_amount} but exchange network requires min ${comp.exchange_minimum_required} ${asset.token_symbol}.`;
+                    } else if (comp && comp.status.includes('SECURITY_ALERT_FAILED')) {
+                        limitColor = 'var(--tech-red)'; limitBg = 'rgba(255,51,102,0.06)';
+                        limitText = '[✕] COMPLIANCE REJECTED: CRITICAL BLOCK';
+                        limitDesc = "Asset configuration parameters failed against exchange secure vault infrastructure.";
+                    } else {
+                        limitColor = 'var(--accent-green)'; limitBg = 'rgba(0,255,170,0.04)';
+                        limitText = '[✓] COMPLIANCE LIMIT PASSED';
+                        limitDesc = "The transaction amount satisfies the exchange ingress flow limits.";
+                    }
+
+                    humanPanel.innerHTML += `
+                        <div class="p-2 mb-2 rounded font-monospace border" style="background:${limitBg}; border-color: ${limitColor}; color:${limitColor}; font-size:11.5px; direction:ltr; text-align:left;">
+                            <div class="fw-bold mb-1"><i class="fa-solid fa-building-columns me-1"></i>${limitText}</div>
+                            <div style="font-size:10.5px; color:#fff; opacity:0.8;">${limitDesc}</div>
+                        </div>`;
+
+                    // ۳. ماژول بررسی حافظه اختصاصی ممو (شبکه TON)
+                    if (tx.network && tx.network.toUpperCase() === "TON") {
+                        let memoColor, memoBg, memoText, memoDesc;
+                        if (comp && comp.status.includes('MEMO_MISSING')) {
+                            memoColor = 'var(--tech-red)'; memoBg = 'rgba(255,51,102,0.06)';
+                            memoText = '[✕] REJECTED: DESTINATION MEMO MISSING';
+                            memoDesc = "TON architecture demands an explicit memo string. Balance is locked in hot-wallet buffer.";
+                        } else {
+                            memoColor = 'var(--accent-green)'; memoBg = 'rgba(0,255,170,0.04)';
+                            memoText = '[✓] TON MEMO ATTACHED & VALID';
+                            memoDesc = `Target memo payload identified: "${meta.memo || 'Verified Link'}"`;
+                        }
+
+                        humanPanel.innerHTML += `
+                            <div class="p-2 mb-2 rounded font-monospace border" style="background:${memoBg}; border-color: ${memoColor}; color:${memoColor}; font-size:11.5px; direction:ltr; text-align:left;">
+                                <div class="fw-bold mb-1"><i class="fa-solid fa-key me-1"></i>${memoText}</div>
+                                <div style="font-size:10.5px; color:#fff; opacity:0.8;">${memoDesc}</div>
+                            </div>`;
+                    }
+                } else {
+                    humanPanel.innerHTML = '<div class="text-danger font-monospace" style="font-size:12px;">[✕] Target signature not found in ledger block history.</div>';
+                }
+            } catch {
+                jsonOutput.innerText = "Pipeline transmission loss.";
+                humanPanel.innerHTML = '<div class="text-danger font-monospace" style="font-size:12px;">[✕] Connection error. Pipeline transmission loss.</div>';
+            }
+        }
+
+        async function loadWhitelistData() {
+            try {
+                const res = await fetch('http://localhost:8080/api/whitelist', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById('whitelist-table-body'); tbody.innerHTML = '';
+                if(!data.whitelist || data.whitelist.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-muted text-center py-4">No contracts whitelisted on this node database.</td></tr>'; return;
+                }
+                data.whitelist.forEach(item => {
+                    tbody.innerHTML += `<tr>
+                        <td><span class="sub-badge" style="color:var(--tech-blue); border-color:rgba(0,187,249,0.2); background:rgba(0,187,249,0.02)">${item.network}</span></td>
+                        <td><strong style="color:#fff;">${item.token_symbol}</strong></td>
+                        <td class="text-white-50 font-monospace small">${item.contract_address}</td>
+                        <td class="text-muted small">${item.created_at ? item.created_at.substring(0,10) : 'N/A'}</td>
+                        <td><i class="fa-solid fa-trash text-danger" style="cursor:pointer; font-size:13px;" onclick="deleteWhitelistItem(${item.id})"></i></td>
+                    </tr>`;
+                });
+            } catch {}
+        }
+
+        async function addWhitelistToken(e) {
+            e.preventDefault();
+            const payload = {
+                network: document.getElementById('w-network').value,
+                token_symbol: document.getElementById('w-symbol').value.trim(),
+                contract_address: document.getElementById('w-address').value.trim()
+            };
+            await fetch('http://localhost:8080/api/whitelist', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
+            document.getElementById('whitelist-form').reset(); loadWhitelistData();
+        }
+
+        async function deleteWhitelistItem(id) {
+            if(!confirm("Remove from whitelist?")) return;
+            await fetch(`http://localhost:8080/api/whitelist/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            loadWhitelistData();
+        }
+
+        async function loadDepositRulesData() {
+            try {
+                const res = await fetch('http://localhost:8080/api/deposit-rules', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById('dr-table-body'); tbody.innerHTML = '';
+                if(!data.rules || data.rules.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-muted text-center py-4">No active minimum limits computed.</td></tr>'; return;
+                }
+                data.rules.forEach(item => {
+                    tbody.innerHTML += `<tr>
+                        <td><span class="sub-badge" style="color:var(--tech-orange); border-color:rgba(255,159,28,0.2); background:rgba(255,159,28,0.02)">${item.network.toUpperCase()}</span></td>
+                        <td><strong style="color:#fff;">${item.token_symbol}</strong></td>
+                        <td style="color:var(--accent-green); font-weight:700;">${item.min_deposit} ${item.token_symbol}</td>
+                        <td class="text-muted small">${item.created_at ? item.created_at.substring(0,10) : 'N/A'}</td>
+                        <td><i class="fa-solid fa-trash text-danger" style="cursor:pointer; font-size:13px;" onclick="deleteDepositRule(${item.id})"></i></td>
+                    </tr>`;
+                });
+            } catch {}
+        }
+
+        async function addDepositRule(e) {
+            e.preventDefault();
+            const payload = { network: document.getElementById('dr-network').value.trim(), token_symbol: document.getElementById('dr-symbol').value.trim(), min_deposit: document.getElementById('dr-min-deposit').value.trim() };
+            await fetch('http://localhost:8080/api/deposit-rules', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
+            document.getElementById('deposit-rules-form').reset(); loadDepositRulesData();
+        }
+
+        async function deleteDepositRule(id) {
+            if(!confirm("Drop limit constraint?")) return;
+            await fetch(`http://localhost:8080/api/deposit-rules/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            loadDepositRulesData();
+        }
+
+        async function loadHistoryData() {
+            try {
+                const res = await fetch('http://localhost:8080/api/history/logs', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById('history-table-body'); tbody.innerHTML = '';
+                if (!data.history || data.history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-muted text-center py-4">No historical telemetry logs captured.</td></tr>'; return;
+                }
+                data.history.forEach(item => {
+                    let srcColor = item.request_source === 'WEB' ? 'text-info' : 'text-danger';
+                    tbody.innerHTML += `<tr>
+                        <td class="text-white-50 font-monospace small" style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${item.search_query}">${item.search_query}</td>
+                        <td><span class="sub-badge" style="color:#fff; border-color:rgba(255,255,255,0.1); background:rgba(255,255,255,0.02)">${item.search_type}</span></td>
+                        <td><span style="color:#fff;">${item.detected_network || 'N/A'}</span></td>
+                        <td><span class="${srcColor}" style="font-weight:600;">${item.request_source}</span></td>
+                        <td style="color:${item.status === 'SUCCESS'?'var(--accent-green)':'var(--tech-red)'}; font-weight:600;">${item.status}</td>
+                        <td class="text-muted small">${item.timestamp ? item.timestamp.substring(11,19) : 'N/A'} UTC</td>
+                    </tr>`;
+                });
+            } catch (err) {}
+        }
+
+        function logout() { localStorage.clear(); window.location.href = '/'; }
+    </script>
+</body>
+</html>
