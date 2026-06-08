@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Receipt - Ronin Matrix</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+    <style>
+        :root {
+            --bg-main: #02060d;
+            --glass-bg: rgba(4, 11, 22, 0.75);
+            --border-tech: rgba(255, 255, 255, 0.05);
+            --accent-green: #00ffaa;
+            --tech-blue: #00bbf9;
+            --tech-orange: #ff9f1c;
+            --tech-red: #ff3366;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main); color: #ffffff; font-family: var(--font-sans);
+            margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: flex-start;
+            padding: 40px 10%; overflow-x: hidden; position: relative;
+        }
+
+        /* 1. 3D Solar System Canvas Background */
+        #solar-system-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -3; }
+
+        /* 2. CRT Scanlines Overlay */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.15;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+        }
+
+        /* 3. Laser Tracing Border Wrapper */
+        .laser-border-wrapper {
+            position: relative; width: 100%; max-width: 600px; border-radius: 14px; padding: 2px;
+            background: rgba(255,255,255,0.03); z-index: 10; overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7); margin-right: auto;
+        }
+
+        @media (max-width: 992px) {
+            body { justify-content: center; padding: 20px; }
+            .laser-border-wrapper { margin: 0 auto; }
+        }
+
+        .laser-border-wrapper::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent, transparent, transparent 30%); 
+            animation: rotateLaser 4s linear infinite; z-index: -1;
+        }
+        .laser-border-wrapper.status-green::before { background: conic-gradient(transparent, var(--accent-green), transparent 30%); }
+        .laser-border-wrapper.status-red::before { background: conic-gradient(transparent, var(--tech-red), transparent 30%); animation: rotateLaser 1.5s linear infinite; }
+        @keyframes rotateLaser { 100% { transform: rotate(360deg); } }
+
+        /* Main Card */
+        .receipt-card {
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-radius: 12px; height: 100%; display: flex; flex-direction: column;
+        }
+
+        .receipt-header { padding: 25px 30px; border-bottom: 1px solid var(--border-tech); text-align: center; background: rgba(2, 6, 13, 0.9); border-radius: 12px 12px 0 0; }
+        .brand { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; text-shadow: 0 0 10px rgba(0,255,170,0.3); }
+        .brand span { color: var(--accent-green); }
+
+        .receipt-body { padding: 30px; }
+        .human-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.88rem; font-family: var(--font-mono); }
+        .human-row:last-child { border: none; }
+        
+        /* 4. Holographic Stamp */
+        .holo-stamp { position: relative; overflow: hidden; transform-style: preserve-3d; transition: transform 0.1s ease, box-shadow 0.1s ease; }
+        .holo-stamp::after {
+            content: ''; position: absolute; top: -150%; left: -150%; width: 50%; height: 400%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            transform: rotate(45deg); transition: left 0.6s ease-in-out; opacity: 0; pointer-events: none;
+        }
+        .holo-stamp:hover::after { left: 200%; opacity: 1; }
+
+        /* 5. Glitch Effect */
+        .glitch-active { animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both 3; }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(-10deg) translate(-2px, 2px); filter: drop-shadow(3px 0 var(--tech-red)) drop-shadow(-3px 0 var(--tech-blue)); }
+            40% { transform: skew(10deg) translate(2px, -2px); filter: none; }
+            60% { transform: skew(-5deg) translate(-1px, 1px); filter: drop-shadow(3px 0 var(--tech-red)); }
+            80% { transform: skew(5deg) translate(1px, -1px); filter: none; }
+            100% { transform: skew(0deg); }
+        }
+
+        .decrypt-target { font-family: var(--font-mono); letter-spacing: 0.5px; }
+
+        /* Visual Tracer Box */
+        .tracer-box { background: rgba(2, 6, 13, 0.8); border: 1px solid var(--border-tech); border-radius: 8px; padding: 20px; margin-top: 25px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .graph-container { display: flex; align-items: center; justify-content: space-between; margin: 25px 0; position: relative; }
+        .graph-node { display: flex; flex-direction: column; align-items: center; z-index: 2; width: 33%; }
+        .node-icon { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px; border: 2px solid; background: #030912; transition: all 0.3s ease; }
+        .node-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-align: center; font-weight: bold; text-transform: uppercase;}
+        .graph-line { position: absolute; top: 22px; left: 16%; right: 16%; height: 2px; background: repeating-linear-gradient(to right, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px); z-index: 1; }
+        
+        .node-pulse-red { animation: pulseRed 2s infinite; border-color: var(--tech-red); color: var(--tech-red); box-shadow: 0 0 15px rgba(255,51,102,0.3); }
+        .node-pulse-green { animation: pulseGreen 2s infinite; border-color: var(--accent-green); color: var(--accent-green); box-shadow: 0 0 15px rgba(0,255,170,0.2); }
+        .node-neutral { border-color: rgba(255,255,255,0.2); color: #cbd5e1; }
+        .node-core { border-color: var(--tech-blue); color: var(--tech-blue); background: rgba(0,187,249,0.1); }
+        
+        @keyframes pulseRed { 0% { box-shadow: 0 0 0 0 rgba(255,51,102,0.4); } 70% { box-shadow: 0 0 0 10px rgba(255,51,102,0); } 100% { box-shadow: 0 0 0 0 rgba(255,51,102,0); } }
+        @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(0,255,170,0.4); } 70% { box-shadow: 0 0 0 10px rgba(0,255,170,0); } 100% { box-shadow: 0 0 0 0 rgba(0,255,170,0); } }
+        .tracer-details { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; line-height: 1.6; color: #cbd5e1; }
+        .detail-highlight-red { color: var(--tech-red); font-weight: bold; }
+        .detail-highlight-green { color: var(--accent-green); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <canvas id="solar-system-bg"></canvas>
+    
+    <div class="scanlines"></div>
+
+    <div class="laser-border-wrapper" id="laser-wrapper">
+        <div class="receipt-card" id="main-card">
+            <div class="receipt-header">
+                <div class="brand"><i class="fa-solid fa-shield-halved me-2"></i>RONIN<span>.</span>CORE</div>
+                <div class="text-white-50 mt-1" style="font-size: 0.75rem; font-family: var(--font-mono); letter-spacing: 1px;">OFFICIAL INGRESS RECEIPT</div>
+            </div>
+
+            <div class="receipt-body" id="receipt-content">
+                <div class="text-center padding-50" style="padding: 50px 20px; font-family: var(--font-mono);">
+                    <i class="fa-solid fa-satellite-dish fa-spin fs-2 mb-3" style="color: var(--tech-blue);"></i>
+                    <div class="decrypt-target" data-final="FETCHING DEEP LEDGER DATA...">------------------------</div>
+                </div>
+            </div>
+
+            <div style="padding: 15px; text-align: center; border-top: 1px solid var(--border-tech); background: rgba(0,0,0,0.4); font-size: 10px; font-family: var(--font-mono); color: rgba(255,255,255,0.3); border-radius: 0 0 12px 12px;">
+                VERIFIED BY RONIN MULTI-CHAIN MATRIX <span id="receipt-date"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. موتور منظومه شمسی سه‌بعدی (3D Solar System Engine)
+        // ==========================================
+        const canvas = document.getElementById('solar-system-bg');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+        let time = 0;
+
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('resize', initCanvas);
+
+        let systemState = 'LOADING'; 
+
+        // ۵ سیاره با مدارهای بیضی‌شکل برای ایجاد پرسپکتیو 3D
+        // rx = شعاع عرضی، ry = شعاع عمودی (عمق)
+        let planets = [
+            { id: 'node', rx: 200, ry: 75, angle: 0.5, speedBase: 0.012, size: 3, color: '#00bbf9', label: 'VALIDATOR_NODE' },
+            { id: 'network', rx: 340, ry: 125, angle: 2.1, speedBase: 0.009, size: 4, color: '#00bbf9', label: 'NETWORK_LAYER' },
+            { id: 'router', rx: 500, ry: 180, angle: 4.2, speedBase: 0.007, size: 4.5, color: '#00bbf9', label: 'SMART_ROUTER' },
+            { id: 'asset', rx: 700, ry: 250, angle: 1.5, speedBase: 0.005, size: 5, color: '#00bbf9', label: 'ASSET_LEDGER' },
+            { id: 'origin', rx: 950, ry: 330, angle: 5.5, speedBase: 0.0035, size: 6.5, color: '#00bbf9', label: 'ORIGIN_EOA' }
+        ];
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        function updateSolarState(state, txNetwork, assetSymbol, isFlagged) {
+            systemState = state;
+            if (state === 'SAFE') {
+                planets.forEach(p => p.color = '#00ffaa');
+                planets[1].label = 'NET: ' + txNetwork;
+                planets[3].label = 'ASSET: ' + assetSymbol;
+                planets[4].label = 'CLEARED_ORIGIN';
+            } else if (state === 'DANGER') {
+                planets.forEach(p => p.color = '#ff9f1c');
+                planets[3].color = '#ff3366'; // Asset قرمز
+                planets[4].color = '#ff3366'; // Origin قرمز
+                planets[1].label = 'NET: ' + txNetwork;
+                planets[3].label = 'ASSET: ' + assetSymbol;
+                planets[4].label = 'RESTRICTED_ORIGIN';
+            }
+        }
+
+        function drawSolarSystem() {
+            // افکت محو شدن ملایم برای رد سیاره‌ها
+            ctx.fillStyle = 'rgba(2, 6, 13, 0.3)'; 
+            ctx.fillRect(0, 0, width, height);
+
+            time += 0.05;
+
+            // قرار دادن هسته (خورشید) در سمت راست تصویر برای جلوگیری از تداخل با کارت
+            let isMobile = width < 992;
+            let baseCx = isMobile ? width / 2 : width * 0.75; 
+            let baseCy = isMobile ? height * 0.2 : height / 2;
+
+            // Parallax سه‌بعدی با موس
+            let targetCx = baseCx + (mouse.x - width / 2) * 0.04;
+            let targetCy = baseCy + (mouse.y - height / 2) * 0.04;
+
+            let coreColor = '#00bbf9';
+            let vibration = 0;
+            let speedMultiplier = 1;
+
+            if (systemState === 'SAFE') {
+                coreColor = '#00ffaa';
+            } else if (systemState === 'DANGER') {
+                coreColor = '#ff3366';
+                vibration = Math.sin(time * 6) * 4; // لرزش شدید هسته و مدارها
+                speedMultiplier = 2.5; // چرخش سریع‌تر سیاره‌ها
+            }
+
+            // رسم خورشید
+            ctx.beginPath();
+            ctx.arc(targetCx + vibration, targetCy + vibration, 24, 0, Math.PI * 2);
+            ctx.fillStyle = coreColor;
+            ctx.shadowBlur = 60;
+            ctx.shadowColor = coreColor;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // رسم خطوط مدار (بیضی)
+            planets.forEach(p => {
+                let currentRx = p.rx + vibration * 1.5;
+                let currentRy = p.ry + vibration;
+
+                ctx.beginPath();
+                ctx.ellipse(targetCx, targetCy, currentRx, currentRy, 0, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 255, 255, ${systemState === 'DANGER' ? 0.15 : 0.05})`;
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 15]); 
+                ctx.stroke();
+                ctx.setLineDash([]); 
+            });
+
+            // مرتب‌سازی سیاره‌ها بر اساس عمق برای حس 3D (تاریک در عقب، روشن در جلو)
+            let sortedPlanets = [...planets].sort((a, b) => Math.sin(a.angle) - Math.sin(b.angle));
+
+            sortedPlanets.forEach(p => {
+                p.angle += (p.speedBase * speedMultiplier);
+                
+                let currentRx = p.rx + vibration * 1.5;
+                let currentRy = p.ry + vibration;
+
+                let px = targetCx + Math.cos(p.angle) * currentRx;
+                let py = targetCy + Math.sin(p.angle) * currentRy;
+
+                // محاسبه عمق (Depth) بین 1- (عقب) و 1+ (جلو)
+                let depth = Math.sin(p.angle); 
+                let zScale = 1 + (depth * 0.4); // مقیاس از 0.6 تا 1.4
+
+                let scaledSize = p.size * zScale;
+
+                // رسم سیاره با در نظر گرفتن عمق
+                ctx.beginPath();
+                ctx.arc(px, py, scaledSize, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.shadowBlur = 20 * zScale;
+                ctx.shadowColor = p.color;
+                ctx.globalAlpha = 0.4 + ((depth + 1) * 0.3); // پشت سر تاریک‌تر است
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1.0;
+
+                // رسم تگ‌های متصل (فقط برای سیاره‌هایی که خیلی عقب نیستند)
+                if(zScale > 0.85) {
+                    let labelAlpha = 0.2 + ((depth + 1) * 0.4);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${labelAlpha})`;
+                    ctx.font = `${10 * zScale}px 'JetBrains Mono'`;
+                    ctx.fillText(p.label, px + (15 * zScale), py - (10 * zScale));
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(px, py);
+                    ctx.lineTo(px + (10 * zScale), py - (8 * zScale));
+                    ctx.strokeStyle = `rgba(${p.color === '#ff3366' ? '255,51,102' : (p.color === '#00ffaa' ? '0,255,170' : '0,187,249')}, ${labelAlpha})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            });
+
+            requestAnimationFrame(drawSolarSystem);
+        }
+        initCanvas(); drawSolarSystem();
+
+        // ==========================================
+        // 2. موتور افکت رمزگشایی (Decrypt Reveal)
+        // ==========================================
+        function runDecryptEffect() {
+            const targets = document.querySelectorAll('.decrypt-target');
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&!";
+            targets.forEach(el => {
+                const finalStr = el.getAttribute('data-final');
+                if(!finalStr) return;
+                let iterations = 0; const speed = 30;
+                const interval = setInterval(() => {
+                    el.innerText = finalStr.split('').map((c, i) => {
+                        if(i < iterations) return c;
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    }).join('');
+                    if(iterations >= finalStr.length) clearInterval(interval);
+                    iterations += 0.5;
+                }, speed);
+            });
+        }
+        runDecryptEffect();
+
+        // ==========================================
+        // 3. دریافت اطلاعات رسید و رندر صفحه
+        // ==========================================
+        const pathParts = window.location.pathname.split('/');
+        const receiptId = pathParts[pathParts.length - 1];
+
+        async function fetchReceipt() {
+            const contentDiv = document.getElementById('receipt-content');
+            const laserWrapper = document.getElementById('laser-wrapper');
+            const mainCard = document.getElementById('main-card');
+            
+            if (!receiptId) {
+                contentDiv.innerHTML = '<div class="text-danger text-center font-monospace">[✕] INVALID RECEIPT ID</div>'; return;
+            }
+
+            try {
+                const res = await fetch(`/api/receipt/${receiptId}`);
+                const responseData = await res.json();
+                if (!res.ok) {
+                    contentDiv.innerHTML = `<div class="text-danger text-center font-monospace" style="font-size:13px;">[✕] ${responseData.error || 'Receipt Not Found'}</div>`; return;
+                }
+
+                document.getElementById('receipt-date').innerText = `// ${responseData.created_at.replace('T', ' ').substring(0, 19)} UTC`;
+                const data = responseData.data;
+                let html = '';
+
+                const tx = data.transaction_info; const asset = data.asset_transfer; const addr = data.address_details;
+                const auth = data.authenticity_check; const comp = data.deposit_compliance; const aml = data.aml_origin_check;
+                
+                let isAmlFlagged = aml && aml.is_flagged;
+
+                // --- اتصال گرافیک منظومه شمسی به دیتای واقعی ---
+                if (tx) {
+                    updateSolarState(isAmlFlagged ? 'DANGER' : 'SAFE', tx.network, asset.token_symbol, isAmlFlagged);
+                } else if (data.address_profile) {
+                    updateSolarState(isAmlFlagged ? 'DANGER' : 'SAFE', data.address_profile.network, 'WALLET', isAmlFlagged);
+                }
+
+                // تنظیم رنگ لیزر دور صفحه
+                laserWrapper.classList.add(isAmlFlagged ? 'status-red' : 'status-green');
+                
+                // اجرای افکت گلیچ در صورت اسکام بودن
+                if(isAmlFlagged) {
+                    mainCard.classList.add('glitch-active');
+                    setTimeout(() => mainCard.classList.remove('glitch-active'), 1000);
+                }
+
+                if (tx) {
+                    html += `<div class="human-row"><span class="text-white-50">Receipt ID:</span><span class="text-white fw-bold decrypt-target" data-final="#${receiptId.toUpperCase()}">########</span></div>`;
+                    html += `<div class="human-row"><span class="text-white-50">Network Tracker:</span><strong class="text-info">${tx.network}</strong></div>`;
+                    
+                    let ledgerStatusColor = tx.status === 'success' ? 'var(--accent-green)' : 'var(--tech-red)';
+                    html += `<div class="human-row"><span class="text-white-50">Ledger Status:</span><span style="color:${ledgerStatusColor}"><i class="fa-solid ${tx.status === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'} me-1"></i>${tx.status.toUpperCase()}</span></div>`;
+                    html += `<div class="human-row"><span class="text-white-50">Asset Ingress:</span><strong class="text-warning" style="font-size:1.1rem;">${asset.amount} ${asset.token_symbol}</strong></div>`;
+                    
+                    html += `<div class="human-row"><span class="text-white-50">Sender (From):</span><span class="text-white-50 small text-truncate decrypt-target" style="max-width:170px;" data-final="${addr.from}">${addr.from}</span></div>`;
+                    html += `<div class="human-row"><span class="text-white-50">Destination (To):</span><span class="text-white-50 small text-truncate decrypt-target" style="max-width:170px;" data-final="${addr.to}">${addr.to}</span></div>`;
+                    
+                    let targetIcon = addr.is_to_contract ? '<i class="fa-solid fa-file-contract me-1"></i> Smart Contract' : '<i class="fa-solid fa-wallet me-1"></i> Standard Wallet';
+                    html += `<div class="human-row"><span class="text-white-50">Target Type:</span><span style="color:${addr.is_to_contract ? 'var(--tech-blue)' : 'var(--text-muted)'}">${targetIcon}</span></div>`;
+                    html += `<div class="human-row"><span class="text-white-50">Tx Hash:</span><span class="text-white-50 small text-truncate decrypt-target" style="max-width:170px;" data-final="${tx.hash}">${tx.hash}</span></div>`;
+                    html += `<hr style="border-color: var(--border-tech); margin: 20px 0;">`;
+
+                    // Tracer 2D Box
+                    let originIcon = isAmlFlagged ? 'fa-building-columns' : 'fa-user-secret';
+                    let originClass = isAmlFlagged ? 'node-pulse-red' : 'node-neutral';
+                    let originLabel = isAmlFlagged ? aml.entity : 'External EOA';
+                    let destClass = isAmlFlagged ? 'node-neutral' : 'node-pulse-green';
+                    let destIcon = isAmlFlagged ? 'fa-ban' : 'fa-vault';
+                    let destLabel = isAmlFlagged ? 'REJECTED' : 'SECURE VAULT';
+
+                    html += `
+                    <div class="tracer-box">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted" style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fa-solid fa-network-wired me-2"></i>Linear Origin Trace
+                            </span>
+                            <span class="badge" style="background: rgba(255,255,255,0.05); color: #cbd5e1; font-family: var(--font-mono); font-size: 9px;">DEEP SCAN</span>
+                        </div>
+                        <div class="graph-container">
+                            <div class="graph-line" style="border-bottom: 2px dashed ${isAmlFlagged ? 'rgba(255,51,102,0.3)' : 'rgba(0,255,170,0.3)'}; background: none;"></div>
+                            <div class="graph-node">
+                                <div class="node-icon ${originClass}"><i class="fa-solid ${originIcon}"></i></div>
+                                <div class="node-label decrypt-target" data-final="${originLabel}">---</div>
+                            </div>
+                            <div class="graph-node">
+                                <div class="node-icon node-core"><i class="fa-solid fa-microchip"></i></div>
+                                <div class="node-label text-info">RONIN MATRIX</div>
+                            </div>
+                            <div class="graph-node">
+                                <div class="node-icon ${destClass}"><i class="fa-solid ${destIcon}"></i></div>
+                                <div class="node-label decrypt-target" data-final="${destLabel}">---</div>
+                            </div>
+                        </div>
+                        <div class="tracer-details">`;
+
+                    if (isAmlFlagged) {
+                        html += `
+                            <div class="mb-2"><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i><span class="detail-highlight-red">CRITICAL AML POLICY VIOLATION</span></div>
+                            Fund origin analysis detected that this transaction originated directly from a restricted entity (<strong class="text-white decrypt-target" data-final="${aml.entity}">---</strong>) categorized under <strong class="text-white">${aml.category}</strong>.<br><br>
+                            To comply with international Anti-Money Laundering (AML) standards, direct deposits from foreign central exchanges, smart contract routers, or privacy mixers are <span class="detail-highlight-red">strictly prohibited</span> and blocked by the Ronin Gateway. The funds have not been credited to your internal ledger account.`;
+                    } else {
+                        html += `
+                            <div class="mb-2"><i class="fa-solid fa-shield-check" style="color:var(--accent-green)"></i> <span class="detail-highlight-green">ORIGIN CLEARED & VERIFIED</span></div>
+                            Deep ledger analysis confirms that the origin address is an unflagged Externally Owned Account (EOA). No connections to sanctioned entities, known mixers, or restricted exchange hot-wallets were detected within the immediate hop radius. The payload has successfully bypassed the AML security gateway.`;
+                    }
+                    html += `</div></div><hr style="border-color: var(--border-tech); margin: 20px 0;">`;
+
+                    // Status Box
+                    let fColor, fBx, fText;
+                    if (comp && comp.status.includes('REJECTED_AML_POLICY')) {
+                        fColor = 'var(--tech-red)'; fBx = 'rgba(255,51,102,0.08)'; fText = '[✕] INGRESS REJECTED: AML BLOCK';
+                    } else if (comp && comp.status.includes('UNDER_MINIMUM_REQUIRED')) {
+                        fColor = 'var(--tech-orange)'; fBx = 'rgba(255,159,28,0.05)'; fText = `[!] DEPOSIT TOO SMALL (Min: ${comp.exchange_minimum_required})`;
+                    } else if (comp && comp.status.includes('SECURITY_ALERT')) {
+                        fColor = 'var(--tech-red)'; fBx = 'rgba(255,51,102,0.08)'; fText = '[✕] INGRESS REJECTED: ASSET MISMATCH';
+                    } else {
+                        fColor = 'var(--tech-blue)'; fBx = 'rgba(0,187,249,0.05)'; fText = '[✓] TRANSACTION FULLY APPROVED';
+                    }
+
+                    html += `
+                        <div class="p-3 rounded font-monospace border holo-stamp" id="status-stamp" style="background:${fBx}; border-color: ${fColor} !important; color:${fColor}; font-size:13px; text-align:center;">
+                            <div class="fw-bold decrypt-target" data-final="${fText}">---------</div>
+                        </div>`;
+                
+                } else if (data.address_profile) {
+                    html += `<div class="human-row"><span class="text-white-50">Target Entity:</span><strong>Wallet Address Profile</strong></div>`;
+                    html += `<div class="human-row"><span class="text-white-50">Network:</span><strong class="text-info">${data.address_profile.network}</strong></div>`;
+                    html += `<div class="human-row"><span class="text-white-50">Address:</span><span class="text-white-50 small text-truncate decrypt-target" style="max-width:180px;" data-final="${data.address_profile.address}">...</span></div>`;
+                    html += `<div class="human-row"><span class="text-white-50">Balance:</span><strong class="text-warning">${data.balances.native_balance}</strong></div>`;
+                    
+                    let statColor = isAmlFlagged ? 'var(--tech-red)' : 'var(--accent-green)';
+                    let statBg = isAmlFlagged ? 'rgba(255,51,102,0.1)' : 'rgba(0,255,170,0.05)';
+                    let statText = isAmlFlagged ? 'BLACKLISTED' : 'CLEARED';
+                    html += `<div class="human-row"><span class="text-white-50">AML Status:</span><span class="sub-badge decrypt-target" style="color:${statColor}; border-color:${statColor}; background:${statBg}" data-final="${statText}">---</span></div>`;
+                }
+
+                contentDiv.innerHTML = html;
+                
+                setTimeout(runDecryptEffect, 100);
+
+                // ==========================================
+                // 4. افکت Tilt و هولوگرافیک برای مهر نهایی
+                // ==========================================
+                const stamp = document.getElementById('status-stamp');
+                if(stamp) {
+                    stamp.addEventListener('mousemove', (e) => {
+                        const rect = stamp.getBoundingClientRect();
+                        const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                        const centerX = rect.width / 2; const centerY = rect.height / 2;
+                        const rotateX = ((y - centerY) / centerY) * -10;
+                        const rotateY = ((x - centerX) / centerX) * 10; 
+                        stamp.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                        stamp.style.boxShadow = `${-rotateY}px ${rotateX}px 20px rgba(0,0,0,0.4)`;
+                    });
+                    stamp.addEventListener('mouseleave', () => {
+                        stamp.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                        stamp.style.boxShadow = `none`;
+                    });
+                }
+
+            } catch (err) {
+                contentDiv.innerHTML = '<div class="text-danger text-center font-monospace">[✕] NETWORK_FAILURE</div>';
+            }
+        }
+
+        fetchReceipt();
+    </script>
+</body>
+</html>

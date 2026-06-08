@@ -17,7 +17,6 @@
             --glass-bg: rgba(6, 17, 33, 0.65);
             --border-tech: rgba(255, 255, 255, 0.05);
 
-            /* نئون آکسنت‌های لوکس تیره بلاکچینی */
             --accent-green: #00ffaa;
             --tech-blue: #00bbf9;
             --tech-orange: #ff9f1c;
@@ -30,7 +29,6 @@
             --font-sans: 'Plus Jakarta Sans', sans-serif;
         }
 
-        /* اسکرول‌بار اختصاصی شبکه */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-main); }
         ::-webkit-scrollbar-thumb { background: #102542; border-radius: 3px; }
@@ -49,7 +47,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* خطوط ماتریکسی ظریف پس‌زمینه */
         body::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
@@ -57,62 +54,31 @@
             background-size: 80px 80px; pointer-events: none; z-index: 0;
         }
 
-        /* سایدبار لوکس شیشه‌ای ملوانی */
         .sidebar {
-            width: 270px;
-            background-color: var(--bg-sidebar);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border-tech);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            z-index: 100;
+            width: 270px; background-color: var(--bg-sidebar); backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px); border-right: 1px solid var(--border-tech);
+            display: flex; flex-direction: column; justify-content: space-between; height: 100%; z-index: 100;
         }
 
         .sidebar-brand {
-            padding: 25px 20px;
-            font-size: 1.2rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            border-bottom: 1px solid var(--border-tech);
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding: 25px 20px; font-size: 1.2rem; font-weight: 800; letter-spacing: -0.5px;
+            border-bottom: 1px solid var(--border-tech); color: var(--text-main); display: flex; align-items: center; gap: 10px;
         }
         .sidebar-brand span { color: var(--accent-green); }
         .sidebar-brand img { width: 22px; height: 22px; filter: grayscale(100%) brightness(200%); }
 
-        .sidebar-menu {
-            list-style: none;
-            padding: 20px 0;
-            margin: 0;
-            flex-grow: 1;
-        }
+        .sidebar-menu { list-style: none; padding: 20px 0; margin: 0; flex-grow: 1; }
 
         .menu-item {
-            padding: 14px 20px;
-            color: var(--text-muted);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            font-family: var(--font-mono);
-            letter-spacing: 0.5px;
-            border-left: 3px solid transparent;
-            transition: all 0.2s ease;
+            padding: 14px 20px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center;
+            gap: 12px; font-size: 0.78rem; text-transform: uppercase; font-weight: 600; font-family: var(--font-mono);
+            letter-spacing: 0.5px; border-left: 3px solid transparent; transition: all 0.2s ease;
         }
         .menu-item:hover { color: #fff; background: rgba(255, 255, 255, 0.02); }
         .menu-item.active { border-left-color: var(--accent-green); background: rgba(0, 255, 170, 0.04); color: #fff; }
 
         .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-tech); font-size: 0.75rem; background: rgba(4, 11, 22, 0.4); font-family: var(--font-mono); }
 
-        /* پنجره اصلی محتوا */
         .content-window { flex-grow: 1; height: 100%; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; position: relative; z-index: 1; }
         .tab-content-panel { display: none; }
         .tab-content-panel.active { display: block; }
@@ -120,43 +86,31 @@
         .panel-header { border-bottom: 1px solid var(--border-tech); padding-bottom: 15px; margin-bottom: 30px; }
         .panel-header h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; margin: 0; color: #fff; }
 
-        /* پنل شیشه‌ای ارتقا یافته */
         .card-flat {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border-tech);
-            border-radius: 12px;
-            padding: 28px;
-            margin-bottom: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-tech); border-radius: 12px; padding: 28px; margin-bottom: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
         .card-flat h5 { font-family: var(--font-sans); font-size: 0.95rem; font-weight: 700; text-transform: uppercase; margin-bottom: 18px; letter-spacing: 0.5px; color: #fff; display: flex; align-items: center; }
 
-        /* فیلدهای ورودی سایبرپانکی لوکس */
         .input-raw {
-            background: rgba(4, 13, 26, 0.8) !important;
-            border: 1px solid rgba(0, 255, 170, 0.25) !important;
-            border-radius: 6px !important;
-            color: #ffffff !important;
-            font-family: var(--font-mono);
-            padding: 13px 16px !important;
-            font-size: 0.85rem;
-            outline: none;
-            transition: all 0.25s ease;
+            background: rgba(4, 13, 26, 0.8) !important; border: 1px solid rgba(0, 255, 170, 0.25) !important;
+            border-radius: 6px !important; color: #ffffff !important; font-family: var(--font-mono); padding: 13px 16px !important;
+            font-size: 0.85rem; outline: none; transition: all 0.25s ease;
         }
         .input-raw:focus { border-color: var(--accent-green) !important; box-shadow: 0 0 12px rgba(0, 255, 170, 0.15) !important; background: rgba(6, 22, 44, 0.9) !important; }
         select.input-raw option { background: #061121; color: #fff; }
 
-        /* دکمه پردازش نئونی */
         .btn-raw {
-            background: #ffffff; border: none; color: #040a14; font-weight: 700; border-radius: 6px; padding: 13px 24px; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; font-family: var(--font-mono); transition: all 0.2s ease;
+            background: #ffffff; border: none; color: #040a14; font-weight: 700; border-radius: 6px; padding: 13px 24px;
+            font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; font-family: var(--font-mono); transition: all 0.2s ease;
         }
         .btn-raw:hover { background: #f1f5f9; transform: translateY(-1px); box-shadow: 0 5px 15px rgba(255,255,255,0.1); }
 
+        .btn-raw-danger { background: rgba(255, 51, 102, 0.1); color: var(--tech-red); border: 1px solid var(--tech-red); }
+        .btn-raw-danger:hover { background: var(--tech-red); color: #fff; }
+
         pre { background: #030912 !important; border: 1px solid var(--border-tech); color: var(--accent-green) !important; padding: 20px; border-radius: 8px; max-height: 450px; overflow-y: auto; font-size: 12.5px; font-family: var(--font-mono); }
 
-        /* جداول شبکه داده */
         .table-raw { width: 100%; border-collapse: collapse; font-size: 0.82rem; font-family: var(--font-mono); }
         .table-raw th { background: rgba(4, 11, 22, 0.5); color: var(--text-muted); text-transform: uppercase; font-size: 0.72rem; padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border-tech); font-weight: 700; letter-spacing: 0.5px; }
         .table-raw td { padding: 14px 12px; border-bottom: 1px solid var(--border-tech); color: #cbd5e1; text-align: left; vertical-align: middle; }
@@ -170,6 +124,39 @@
         .doc-pill-btn { background: rgba(255,255,255,0.02); color: var(--text-muted); border: 1px solid var(--border-tech); font-size: 0.75rem; padding: 6px 14px; border-radius: 4px; transition: all 0.2s; cursor: pointer; font-family: var(--font-mono); }
         .doc-pill-btn:hover { color: #fff; }
         .doc-pill-btn.active { background: rgba(0, 255, 170, 0.1); border-color: var(--accent-green); color: var(--accent-green); font-weight: bold; }
+
+        .mention-dropdown {
+            position: absolute; bottom: 100%; left: 0; width: 220px;
+            background: rgba(4, 13, 26, 0.95); backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 187, 249, 0.3); border-radius: 8px;
+            max-height: 160px; overflow-y: auto; z-index: 1000;
+            box-shadow: 0 -10px 25px rgba(0,0,0,0.5); padding: 5px; margin-bottom: 5px;
+        }
+        .mention-item {
+            padding: 10px 12px; font-family: var(--font-mono); font-size: 11px;
+            color: #cbd5e1; cursor: pointer; transition: all 0.2s; border-radius: 4px;
+        }
+        .mention-item:hover { background: rgba(0, 187, 249, 0.1); color: var(--tech-blue); }
+
+        .tracer-box { background: rgba(3, 9, 18, 0.8); border: 1px solid var(--border-tech); border-radius: 8px; padding: 20px; margin-top: 15px; margin-bottom: 15px; }
+        .graph-container { display: flex; align-items: center; justify-content: space-between; margin: 25px 0; position: relative; }
+        .graph-node { display: flex; flex-direction: column; align-items: center; z-index: 2; width: 33%; }
+        .node-icon { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px; border: 2px solid; background: #030912; transition: all 0.3s ease; }
+        .node-label { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-align: center; font-weight: bold; text-transform: uppercase;}
+        .graph-line { position: absolute; top: 22px; left: 16%; right: 16%; height: 2px; background: repeating-linear-gradient(to right, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 5px, transparent 5px, transparent 10px); z-index: 1; }
+        
+        .node-pulse-red { animation: pulseRed 2s infinite; border-color: var(--tech-red); color: var(--tech-red); box-shadow: 0 0 15px rgba(255,51,102,0.3); }
+        .node-pulse-green { animation: pulseGreen 2s infinite; border-color: var(--accent-green); color: var(--accent-green); box-shadow: 0 0 15px rgba(0,255,170,0.2); }
+        .node-neutral { border-color: rgba(255,255,255,0.2); color: #cbd5e1; }
+        .node-core { border-color: var(--tech-blue); color: var(--tech-blue); background: rgba(0,187,249,0.1); }
+
+        @keyframes pulseRed { 0% { box-shadow: 0 0 0 0 rgba(255,51,102,0.4); } 70% { box-shadow: 0 0 0 10px rgba(255,51,102,0); } 100% { box-shadow: 0 0 0 0 rgba(255,51,102,0); } }
+        @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(0,255,170,0.4); } 70% { box-shadow: 0 0 0 10px rgba(0,255,170,0); } 100% { box-shadow: 0 0 0 0 rgba(0,255,170,0); } }
+
+        /* استایل‌های اختصاصی برای تب مستندات API */
+        .api-method-badge { font-family: var(--font-mono); font-size: 10px; padding: 4px 8px; border-radius: 4px; background: rgba(0,255,170,0.1); color: var(--accent-green); border: 1px solid rgba(0,255,170,0.2); margin-right: 10px; }
+        .api-route-text { font-family: var(--font-mono); font-size: 14px; color: #fff; }
+        .info-panel { background: rgba(0,187,249,0.05); border: 1px solid rgba(0,187,249,0.2); border-left: 3px solid var(--tech-blue); padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -184,6 +171,7 @@
                 <li class="menu-item active" onclick="switchTab('tab-console', this)"><i class="fa-solid fa-terminal"></i> Console Scan</li>
                 <li class="menu-item" onclick="switchTab('tab-whitelist', this)"><i class="fa-solid fa-shield-halved"></i> Whitelist Manager</li>
                 <li class="menu-item" onclick="switchTab('tab-deposit-rules', this)"><i class="fa-solid fa-money-bill-transfer"></i> Deposit Limits</li>
+                <li class="menu-item" onclick="switchTab('tab-blacklist', this)" style="color: var(--tech-red);"><i class="fa-solid fa-ban"></i> AML Blacklist</li>
                 <li class="menu-item" onclick="switchTab('tab-history', this)"><i class="fa-solid fa-database"></i> Database Logs</li>
                 <li class="menu-item" onclick="switchTab('tab-docs', this)"><i class="fa-solid fa-code"></i> API Integration Docs</li>
             </ul>
@@ -213,11 +201,27 @@
             <div id="result-box" class="d-none">
                 <div class="row g-4">
                     <div class="col-md-5">
-                        <div class="card-flat" style="height: 100%; margin-bottom: 0;">
+                        <div class="card-flat" style="margin-bottom: 20px;">
                             <h5><i class="fa-solid fa-circle-info me-2 text-info"></i>Human Interpretation</h5>
                             <div id="human-summary-panel" class="pt-2"></div>
                         </div>
+
+                        <div class="card-flat d-none" id="team-notes-container" style="padding: 20px; background: rgba(3, 9, 18, 0.8);">
+                            <h5 style="font-size: 0.85rem;"><i class="fa-solid fa-comments me-2" style="color: var(--tech-orange)"></i>Operator Intel Notes</h5>
+                            
+                            <div id="notes-timeline" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px; font-family: var(--font-mono); font-size: 11px;">
+                                </div>
+
+                            <form id="note-form" onsubmit="postNote(event)" class="d-flex gap-2 align-items-end">
+                                <div style="position: relative; width: 100%;">
+                                    <div id="mention-dropdown" class="mention-dropdown d-none"></div>
+                                    <input type="text" id="note-input" class="form-control input-raw w-100" placeholder="Type @username or @all..." autocomplete="off" style="font-size: 11px; padding: 10px !important;">
+                                </div>
+                                <button type="submit" class="btn btn-raw" style="padding: 8px 15px; height: 38px;"><i class="fa-solid fa-paper-plane text-info"></i></button>
+                            </form>
+                        </div>
                     </div>
+
                     <div class="col-md-7">
                         <div class="card-flat" style="height: 100%; margin-bottom: 0;">
                             <h5><i class="fa-solid fa-code me-2 text-success"></i>Raw Telemetry Logs</h5>
@@ -317,6 +321,53 @@
             </div>
         </div>
 
+        <div id="tab-blacklist" class="tab-content-panel">
+            <div class="panel-header"><h2 class="text-danger">AML RESTRICTED ENTITIES (BLACKLIST)</h2></div>
+            <div class="card-flat" style="border-color: rgba(255, 51, 102, 0.3);">
+                <h5 class="text-danger"><i class="fa-solid fa-skull-crossbones me-2"></i>Add Restricted Origin Address</h5>
+                <form id="blacklist-form" onsubmit="addBlacklist(event)" class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="text-muted small mb-1" style="font-family: var(--font-mono); font-size: 11px;">Wallet / Contract Address</label>
+                        <input type="text" id="bl-address" class="form-control input-raw font-monospace" placeholder="0x... or Tron Address" required autocomplete="off">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="text-muted small mb-1" style="font-family: var(--font-mono); font-size: 11px;">Entity Name (e.g. Binance Hot Wallet)</label>
+                        <input type="text" id="bl-entity" class="form-control input-raw" placeholder="Exchange Name / Hacker" required autocomplete="off">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="text-muted small mb-1" style="font-family: var(--font-mono); font-size: 11px;">Risk Category</label>
+                        <select id="bl-category" class="form-control input-raw" required>
+                            <option value="Foreign Exchange">Foreign Exchange</option>
+                            <option value="Mixer (Tornado)">Mixer / Privacy</option>
+                            <option value="Hacker / Scammer">Hacker / Phishing</option>
+                            <option value="Sanctioned Entity">Sanctioned Entity</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-raw btn-raw-danger w-100">BLOCK LIST</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-flat">
+                <h5>Active Monitored Blacklist</h5>
+                <table class="table-raw" id="table-blacklist">
+                    <thead>
+                        <tr>
+                            <th>Address</th>
+                            <th>Entity Tag</th>
+                            <th>Risk Category</th>
+                            <th>Added On</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="blacklist-table-body">
+                        <tr><td colspan="5" class="text-muted">Loading blacklisted origins...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div id="tab-history" class="tab-content-panel">
             <div class="panel-header"><h2>SQLITE PERSISTENT LOGS</h2></div>
             <div class="card-flat">
@@ -347,34 +398,54 @@
 
                 <div class="row g-4 mt-2">
                     <div class="col-md-6">
-                        <h5 class="small text-muted text-uppercase mb-3">HTTP REQUEST STRUCTURE (POST Gateway)</h5>
-                        <div class="p-3 mb-3 rounded text-start" style="direction:ltr; background: #030912; border: 1px solid var(--border-tech);">
-                            <span class="badge bg-danger me-2" style="font-family: var(--font-mono); font-size: 10px; padding: 5px 8px;">POST</span><code class="text-info" style="font-size:13px; font-family: var(--font-mono)">http://localhost:8080/api/v1/webhook</code>
+                        <h5 class="small text-muted text-uppercase mb-3">HTTP REQUEST STRUCTURE</h5>
+                        <div class="p-3 mb-3 rounded text-start d-flex align-items-center" style="direction:ltr; background: #030912; border: 1px solid var(--border-tech);">
+                            <span class="api-method-badge">POST</span>
+                            <span class="api-route-text">/api/v1/webhook</span>
+                        </div>
+
+                        <div class="info-panel">
+                            <strong class="text-white"><i class="fa-solid fa-bolt text-warning me-2"></i>Smart Payload Detection:</strong><br>
+                            This API endpoint supports auto-detection. You do not need to specify if the target is a hash or an address. You can send requests using two formats:
+                            <ul class="mt-2 mb-0" style="padding-left: 20px;">
+                                <li><strong>Method 1 (JSON):</strong> Send an object with a <code>data</code>, <code>tx_hash</code>, or <code>address</code> key.</li>
+                                <li><strong>Method 2 (Raw Text):</strong> Send the raw signature as plain text without any formatting.</li>
+                            </ul>
                         </div>
 
                         <div class="d-flex gap-2 mb-2 font-monospace" style="direction: ltr;">
-                            <button class="doc-pill-btn active" id="btn-snip-curl" onclick="switchSnippet('curl')">cURL</button>
-                            <button class="doc-pill-btn" id="btn-snip-js" onclick="switchSnippet('js')">Node.js</button>
-                            <button class="doc-pill-btn" id="btn-snip-py" onclick="switchSnippet('py')">Python</button>
+                            <button class="doc-pill-btn active" id="btn-snip-curl" onclick="switchSnippet('curl')">cURL (Raw Text)</button>
+                            <button class="doc-pill-btn" id="btn-snip-js" onclick="switchSnippet('js')">Node.js (JSON)</button>
+                            <button class="doc-pill-btn" id="btn-snip-py" onclick="switchSnippet('py')">Python (JSON)</button>
                         </div>
 
                         <div id="snip-curl" class="doc-snippet-view">
-                            <pre class="doc-pre"><span style="color: #ff3366;">curl</span> -X POST http://localhost:8080/api/v1/webhook \
-  -H <span style="color: #00bbf9;">"X-API-KEY: your_api_key_here"</span> \
-  -H <span style="color: #00bbf9;">"Content-Type: application/json"</span> \
-  -d <span style="color: #ff9f1c;">'{"tx_hash": "64_CHAR_HEX_SIGNATURE"}'</span></pre>
+                            <pre class="doc-pre"><span style="color: #6b7c96;"># Using Raw Text (text/plain)</span>
+<span style="color: #ff3366;">curl</span> -X POST https://your-domain.com/api/v1/webhook \
+  -H <span style="color: #00bbf9;">"key: your_api_key_here"</span> \
+  -H <span style="color: #00bbf9;">"Content-Type: text/plain"</span> \
+  -d <span style="color: #ff9f1c;">"0x8e459852f1033e9554b13625b74c44554962af1db0ed642b"</span></pre>
                         </div>
                         <div id="snip-js" class="doc-snippet-view d-none">
-                            <pre class="doc-pre"><span style="color: #ff3366;">const</span> response = <span style="color: #ff3366;">await</span> <span style="color: #00bbf9;">fetch</span>(<span style="color: #ff9f1c;">'http://localhost:8080/api/v1/webhook'</span>, {
+                            <pre class="doc-pre"><span style="color: #6b7c96;">// Using JSON (application/json)</span>
+<span style="color: #ff3366;">const</span> response = <span style="color: #ff3366;">await</span> <span style="color: #00bbf9;">fetch</span>(<span style="color: #ff9f1c;">'https://your-domain.com/api/v1/webhook'</span>, {
     method: <span style="color: #ff9f1c;">'POST'</span>,
-    headers: { <span style="color: #00bbf9;">'X-API-KEY'</span>: <span style="color: #ff9f1c;">'API_KEY'</span>, <span style="color: #00bbf9;">'Content-Type'</span>: <span style="color: #ff9f1c;">'application/json'</span> },
-    body: <span style="color: #00bbf9;">JSON</span>.<span style="color: #ff9f1c;">stringify</span>({ tx_hash: <span style="color: #ff9f1c;">'HASH'</span> })
+    headers: { 
+        <span style="color: #00bbf9;">'key'</span>: <span style="color: #ff9f1c;">'your_api_key_here'</span>, 
+        <span style="color: #00bbf9;">'Content-Type'</span>: <span style="color: #ff9f1c;">'application/json'</span> 
+    },
+    body: <span style="color: #00bbf9;">JSON</span>.<span style="color: #ff9f1c;">stringify</span>({ data: <span style="color: #ff9f1c;">'0x8e459852f...'</span> })
 });</pre>
                         </div>
                         <div id="snip-py" class="doc-snippet-view d-none">
-                            <pre class="doc-pre"><span style="color: #ff3366;">import</span> requests
-headers = {<span style="color: #00bbf9;">"X-API-KEY"</span>: <span style="color: #ff9f1c("KEY"</span>, <span style="color: #00bbf9;">"Content-Type"</span>: <span style="color: #ff9f1c;">"json"</span>}
-res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span style="color: #00bbf9;">"tx_hash"</span>: <span style="color: #ff9f1c;">"HASH"</span>}, headers=headers)</pre>
+                            <pre class="doc-pre"><span style="color: #6b7c96;"># Using JSON (application/json)</span>
+<span style="color: #ff3366;">import</span> requests
+
+<span style="color: #ff9f1c;">headers</span> = {<span style="color: #00bbf9;">"key"</span>: <span style="color: #ff9f1c;">"your_api_key_here"</span>, <span style="color: #00bbf9;">"Content-Type"</span>: <span style="color: #ff9f1c;">"application/json"</span>}
+<span style="color: #ff9f1c;">payload</span> = {<span style="color: #00bbf9;">"data"</span>: <span style="color: #ff9f1c;">"0x8e459852f1033e9554b13625b74c44554962af1db"</span>}
+
+<span style="color: #ff9f1c;">response</span> = <span style="color: #ff3366;">requests</span>.<span style="color: #ff9f1c;">post</span>(<span style="color: #ff9f1c;">"https://your-domain.com/api/v1/webhook"</span>, <span style="color: #ff9f1c;">json</span>=payload, <span style="color: #ff9f1c;">headers</span>=headers)
+<span style="color: #ff3366;">print</span>(response.<span style="color: #ff9f1c;">json</span>())</pre>
                         </div>
                     </div>
 
@@ -403,6 +474,8 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
         document.getElementById('user-display').innerText = (localStorage.getItem('ronin_user') || 'OP').toUpperCase();
         document.getElementById('api-key-display').value = apiKey;
 
+        let currentTargetHash = null; 
+
         function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('active'));
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
@@ -412,14 +485,18 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
             if (tabId === 'tab-history') loadHistoryData();
             if (tabId === 'tab-whitelist') loadWhitelistData();
             if (tabId === 'tab-deposit-rules') loadDepositRulesData();
+            if (tabId === 'tab-blacklist') loadBlacklistData();
             if (tabId === 'tab-docs') toggleBlueprintOutput('tx');
         }
 
         function switchSnippet(type) {
             document.querySelectorAll('.doc-snippet-view').forEach(el => el.classList.add('d-none'));
-            document.querySelectorAll('.doc-pill-btn').forEach(btn => { if(btn.id.startsWith('btn-snip')) btn.classList.remove('active'); });
+            document.querySelectorAll('.doc-pill-btn').forEach(btn => { 
+                if(btn.id && btn.id.startsWith('btn-snip')) btn.classList.remove('active'); 
+            });
             document.getElementById(`snip-${type}`).classList.remove('d-none');
-            document.getElementById(`btn-snip-${type}`).classList.add('active');
+            const activeBtn = document.getElementById(`btn-snip-${type}`);
+            if(activeBtn) activeBtn.classList.add('active');
         }
 
         function toggleBlueprintOutput(mode) {
@@ -427,15 +504,22 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
             const btnTx = document.getElementById('btn-show-tx-blueprint');
             const btnAddr = document.getElementById('btn-show-addr-blueprint');
             if(mode === 'tx') {
-                btnTx.classList.add('active'); btnAddr.classList.remove('active'); viewer.innerText = txDocString;
+                if(btnTx) btnTx.classList.add('active');
+                if(btnAddr) btnAddr.classList.remove('active');
+                if(viewer) viewer.innerText = txDocString;
             } else {
-                btnAddr.classList.add('active'); btnTx.classList.remove('active'); viewer.innerText = addrDocString;
+                if(btnAddr) btnAddr.classList.add('active');
+                if(btnTx) btnTx.classList.remove('active');
+                if(viewer) viewer.innerText = addrDocString;
             }
         }
 
         async function executeScan() {
             const input = document.getElementById('search-input').value.trim();
             if(!input) return;
+
+            currentTargetHash = null;
+            document.getElementById('team-notes-container').classList.add('d-none');
 
             const resultBox = document.getElementById('result-box');
             const jsonOutput = document.getElementById('json-output');
@@ -445,25 +529,58 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
             jsonOutput.innerText = "Querying live blockchain ledger pipelines...";
             humanPanel.innerHTML = '<div class="text-muted small"><i class="fa-solid fa-sync fa-spin me-2" style="color:var(--accent-green)"></i>Compiling block telemetry data...</div>';
 
-            const bodyData = (input.length === 34 || input.length === 42 || input.length === 44 || input.length === 48)
-                ? { address: input, source: "web_console" }
-                : { tx_hash: input, source: "web_console" };
+            // درخواست هوشمند (JSON) ارسال می‌شود
+            const bodyData = { data: input, source: "web_console" };
 
             try {
-                const res = await fetch('http://localhost:8080/api/v1/webhook', {
+                // آدرس نسبی و هدر key
+                const res = await fetch('/api/v1/webhook', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-API-KEY': apiKey },
+                    headers: { 'Content-Type': 'application/json', 'key': apiKey },
                     body: JSON.stringify(bodyData)
                 });
                 const data = await res.json();
                 jsonOutput.innerText = JSON.stringify(data, null, 2);
                 humanPanel.innerHTML = '';
 
+                let isAmlFlagged = data.aml_origin_check && data.aml_origin_check.is_flagged;
+                if (isAmlFlagged) {
+                    humanPanel.innerHTML += `
+                        <div class="p-3 mb-3 rounded border" style="background: rgba(255,51,102,0.1); border-color: var(--tech-red); color: var(--tech-red);">
+                            <div class="fw-bold mb-1"><i class="fa-solid fa-skull-crossbones me-2"></i>AML CRITICAL ALERT: RESTRICTED ORIGIN</div>
+                            <div style="font-size:12px; color:#fff; font-family: var(--font-mono);">
+                                Target matched against internal blacklist. <br>
+                                Entity: <strong>${data.aml_origin_check.entity}</strong> <br>
+                                Category: <strong>${data.aml_origin_check.category}</strong>
+                            </div>
+                        </div>`;
+                }
+
                 if (data.address_profile) {
                     humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Target Entity:</span><strong>Wallet Address</strong></div>`;
                     humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Type:</span><strong class="text-info">${data.address_profile.address_type.toUpperCase()}</strong></div>`;
                     humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Balance:</span><strong class="text-warning">${data.balances.native_balance}</strong></div>`;
-                    if(data.risk_scoring) {
+                    
+                    let originIcon = isAmlFlagged ? 'fa-building-columns' : 'fa-user-secret';
+                    let originClass = isAmlFlagged ? 'node-pulse-red' : 'node-neutral';
+                    let originLabel = isAmlFlagged ? data.aml_origin_check.entity : 'External EOA';
+
+                    humanPanel.innerHTML += `
+                    <div class="tracer-box">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted" style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fa-solid fa-network-wired me-2"></i>Visual Origin Trace
+                            </span>
+                        </div>
+                        <div class="graph-container" style="margin: 15px 0;">
+                            <div class="graph-node" style="width: 100%;">
+                                <div class="node-icon ${originClass}"><i class="fa-solid ${originIcon}"></i></div>
+                                <div class="node-label" style="color: ${isAmlFlagged ? 'var(--tech-red)' : '#cbd5e1'}">${originLabel}</div>
+                            </div>
+                        </div>
+                    </div>`;
+
+                    if(data.risk_scoring && data.risk_scoring.tags && data.risk_scoring.tags.length > 0) {
                         humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Risk Profiling:</span><span class="sub-badge" style="color:var(--accent-green); border-color:rgba(0,255,170,0.2); background:rgba(0,255,170,0.02)">${data.risk_scoring.tags[0]}</span></div>`;
                     }
                 } else if (data.transaction_info) {
@@ -482,9 +599,39 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
                         humanPanel.innerHTML += `<div class="human-row"><span class="text-white-50">Contract Token:</span><span class="text-white-50 font-monospace small text-truncate" style="max-width:170px;" title="${asset.contract_address}">${asset.contract_address}</span></div>`;
                     }
 
+                    let originIcon = isAmlFlagged ? 'fa-building-columns' : 'fa-user-secret';
+                    let originClass = isAmlFlagged ? 'node-pulse-red' : 'node-neutral';
+                    let originLabel = isAmlFlagged ? data.aml_origin_check.entity : 'External EOA';
+                    let destClass = isAmlFlagged ? 'node-neutral' : 'node-pulse-green';
+                    let destIcon = isAmlFlagged ? 'fa-ban' : 'fa-vault';
+                    let destLabel = isAmlFlagged ? 'REJECTED' : 'SECURE VAULT';
+
+                    humanPanel.innerHTML += `
+                    <div class="tracer-box">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted" style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fa-solid fa-network-wired me-2"></i>Visual Origin Trace
+                            </span>
+                        </div>
+                        <div class="graph-container">
+                            <div class="graph-line" style="border-bottom: 2px dashed ${isAmlFlagged ? 'rgba(255,51,102,0.3)' : 'rgba(0,255,170,0.3)'};"></div>
+                            <div class="graph-node">
+                                <div class="node-icon ${originClass}"><i class="fa-solid ${originIcon}"></i></div>
+                                <div class="node-label" style="color: ${isAmlFlagged ? 'var(--tech-red)' : '#cbd5e1'}">${originLabel}</div>
+                            </div>
+                            <div class="graph-node">
+                                <div class="node-icon node-core"><i class="fa-solid fa-microchip"></i></div>
+                                <div class="node-label text-info">RONIN MATRIX</div>
+                            </div>
+                            <div class="graph-node">
+                                <div class="node-icon ${destClass}"><i class="fa-solid ${destIcon}"></i></div>
+                                <div class="node-label" style="color: ${isAmlFlagged ? '#cbd5e1' : 'var(--accent-green)'}">${destLabel}</div>
+                            </div>
+                        </div>
+                    </div>`;
+
                     humanPanel.innerHTML += `<hr style="border-color: var(--border-tech); margin: 15px 0;">`;
 
-                    // ۱. ماژول بررسی وایت‌لیست
                     let authColor, authBg, authText, authDesc;
                     if (auth && auth.status === 'VERIFIED') {
                         authColor = 'var(--accent-green)'; authBg = 'rgba(0,255,170,0.04)';
@@ -503,9 +650,12 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
                             <div style="font-size:10.5px; color:#fff; opacity:0.8;">${authDesc}</div>
                         </div>`;
 
-                    // ۲. ماژول بررسی سقف حدعقل واریز
                     let limitColor, limitBg, limitText, limitDesc;
-                    if (comp && comp.status.includes('UNDER_MINIMUM_REQUIRED')) {
+                    if (comp && comp.status.includes('REJECTED_AML_POLICY')) {
+                        limitColor = 'var(--tech-red)'; limitBg = 'rgba(255,51,102,0.06)';
+                        limitText = '[✕] COMPLIANCE REJECTED: AML BLOCK';
+                        limitDesc = "Transaction explicitly blocked due to AML origin restrictions.";
+                    } else if (comp && comp.status.includes('UNDER_MINIMUM_REQUIRED')) {
                         limitColor = 'var(--tech-orange)'; limitBg = 'rgba(255,159,28,0.04)';
                         limitText = '[!] COMPLIANCE WARNING: LIMIT UNDERFLOW';
                         limitDesc = `User sent ${comp.user_deposited_amount} but exchange network requires min ${comp.exchange_minimum_required} ${asset.token_symbol}.`;
@@ -525,7 +675,6 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
                             <div style="font-size:10.5px; color:#fff; opacity:0.8;">${limitDesc}</div>
                         </div>`;
 
-                    // ۳. ماژول بررسی حافظه اختصاصی ممو (شبکه TON)
                     if (tx.network && tx.network.toUpperCase() === "TON") {
                         let memoColor, memoBg, memoText, memoDesc;
                         if (comp && comp.status.includes('MEMO_MISSING')) {
@@ -547,6 +696,32 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
                 } else {
                     humanPanel.innerHTML = '<div class="text-danger font-monospace" style="font-size:12px;">[✕] Target signature not found in ledger block history.</div>';
                 }
+
+                if (data.receipt_id) {
+                    const receiptUrl = window.location.origin + '/tx/' + data.receipt_id;
+                    humanPanel.innerHTML += `
+                        <hr style="border-color: var(--border-tech); margin: 20px 0 15px 0;">
+                        <div class="p-3 rounded border" style="background: rgba(0, 187, 249, 0.05); border-color: rgba(0, 187, 249, 0.2) !important;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-white-50 small" style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.5px;">
+                                    <i class="fa-solid fa-link" style="color: var(--tech-blue);"></i> PUBLIC RECEIPT URL
+                                </span>
+                                <span class="badge" style="background: rgba(0, 187, 249, 0.1); color: var(--tech-blue); font-family: var(--font-mono); font-size: 9px;">SHAREABLE</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <input type="text" class="form-control input-raw w-100 text-center" value="${receiptUrl}" id="receipt-url-input" readonly style="font-size: 11.5px; color: var(--tech-blue) !important;">
+                                <button class="btn btn-raw" onclick="copyReceiptLink(this)" style="padding: 10px 18px; font-size: 12px; background: rgba(0, 187, 249, 0.1); color: var(--tech-blue); border: 1px solid rgba(0, 187, 249, 0.2);">
+                                    <i class="fa-solid fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                currentTargetHash = input;
+                document.getElementById('team-notes-container').classList.remove('d-none');
+                loadTeamNotes();
+
             } catch {
                 jsonOutput.innerText = "Pipeline transmission loss.";
                 humanPanel.innerHTML = '<div class="text-danger font-monospace" style="font-size:12px;">[✕] Connection error. Pipeline transmission loss.</div>';
@@ -555,7 +730,7 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
 
         async function loadWhitelistData() {
             try {
-                const res = await fetch('http://localhost:8080/api/whitelist', { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch('/api/whitelist', { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
                 const tbody = document.getElementById('whitelist-table-body'); tbody.innerHTML = '';
                 if(!data.whitelist || data.whitelist.length === 0) {
@@ -580,19 +755,19 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
                 token_symbol: document.getElementById('w-symbol').value.trim(),
                 contract_address: document.getElementById('w-address').value.trim()
             };
-            await fetch('http://localhost:8080/api/whitelist', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
+            await fetch('/api/whitelist', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
             document.getElementById('whitelist-form').reset(); loadWhitelistData();
         }
 
         async function deleteWhitelistItem(id) {
             if(!confirm("Remove from whitelist?")) return;
-            await fetch(`http://localhost:8080/api/whitelist/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            await fetch(`/api/whitelist/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
             loadWhitelistData();
         }
 
         async function loadDepositRulesData() {
             try {
-                const res = await fetch('http://localhost:8080/api/deposit-rules', { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch('/api/deposit-rules', { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
                 const tbody = document.getElementById('dr-table-body'); tbody.innerHTML = '';
                 if(!data.rules || data.rules.length === 0) {
@@ -613,19 +788,52 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
         async function addDepositRule(e) {
             e.preventDefault();
             const payload = { network: document.getElementById('dr-network').value.trim(), token_symbol: document.getElementById('dr-symbol').value.trim(), min_deposit: document.getElementById('dr-min-deposit').value.trim() };
-            await fetch('http://localhost:8080/api/deposit-rules', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
+            await fetch('/api/deposit-rules', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
             document.getElementById('deposit-rules-form').reset(); loadDepositRulesData();
         }
 
         async function deleteDepositRule(id) {
             if(!confirm("Drop limit constraint?")) return;
-            await fetch(`http://localhost:8080/api/deposit-rules/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            await fetch(`/api/deposit-rules/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
             loadDepositRulesData();
+        }
+
+        async function loadBlacklistData() {
+            try {
+                const res = await fetch('/api/blacklist', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                const tbody = document.getElementById('blacklist-table-body'); tbody.innerHTML = '';
+                if(!data.blacklist || data.blacklist.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-muted text-center py-4">No restricted addresses found.</td></tr>'; return;
+                }
+                data.blacklist.forEach(item => {
+                    tbody.innerHTML += `<tr>
+                        <td class="text-white-50 font-monospace small">${item.address}</td>
+                        <td><strong style="color:#fff;">${item.entity_name}</strong></td>
+                        <td><span class="sub-badge" style="color:var(--tech-red); border-color:rgba(255,51,102,0.3); background:rgba(255,51,102,0.1)">${item.risk_category}</span></td>
+                        <td class="text-muted small">${item.created_at.substring(0,10)}</td>
+                        <td><i class="fa-solid fa-trash text-danger" style="cursor:pointer;" onclick="deleteBlacklist(${item.id})"></i></td>
+                    </tr>`;
+                });
+            } catch {}
+        }
+
+        async function addBlacklist(e) {
+            e.preventDefault();
+            const payload = { address: document.getElementById('bl-address').value, entity_name: document.getElementById('bl-entity').value, risk_category: document.getElementById('bl-category').value };
+            await fetch('/api/blacklist', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
+            document.getElementById('blacklist-form').reset(); loadBlacklistData();
+        }
+
+        async function deleteBlacklist(id) {
+            if(!confirm("Remove from Blacklist?")) return;
+            await fetch(`/api/blacklist/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            loadBlacklistData();
         }
 
         async function loadHistoryData() {
             try {
-                const res = await fetch('http://localhost:8080/api/history/logs', { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch('/api/history/logs', { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
                 const tbody = document.getElementById('history-table-body'); tbody.innerHTML = '';
                 if (!data.history || data.history.length === 0) {
@@ -646,6 +854,152 @@ res = requests.post(<span style="color: #ff9f1c;">"URL"</span>, json={<span styl
         }
 
         function logout() { localStorage.clear(); window.location.href = '/'; }
+
+        function copyReceiptLink(btnElement) {
+            const copyText = document.getElementById("receipt-url-input");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                const originalHtml = btnElement.innerHTML;
+                btnElement.innerHTML = '<i class="fa-solid fa-check"></i>';
+                btnElement.style.color = 'var(--accent-green)';
+                btnElement.style.borderColor = 'var(--accent-green)';
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHtml;
+                    btnElement.style.color = 'var(--tech-blue)';
+                    btnElement.style.borderColor = 'rgba(0, 187, 249, 0.2)';
+                }, 1500);
+            });
+        }
+
+        let systemUsers = ['all'];
+
+        async function fetchSystemUsers() {
+            try {
+                const res = await fetch('/api/users/list', { headers: { 'Authorization': `Bearer ${token}` } });
+                const data = await res.json();
+                if (data.users) systemUsers = ['all', ...data.users];
+            } catch(e) { console.error("Failed to load users for mentions"); }
+        }
+        fetchSystemUsers();
+
+        const noteInput = document.getElementById('note-input');
+        const mentionDropdown = document.getElementById('mention-dropdown');
+
+        noteInput.addEventListener('input', function() {
+            const val = this.value;
+            const cursorPosition = this.selectionStart;
+            const textBeforeCursor = val.substring(0, cursorPosition);
+            
+            const match = textBeforeCursor.match(/@(\w*)$/);
+            
+            if (match) {
+                const searchTag = match[1].toLowerCase();
+                const filteredUsers = systemUsers.filter(u => u.toLowerCase().startsWith(searchTag));
+                
+                if (filteredUsers.length > 0) {
+                    mentionDropdown.innerHTML = filteredUsers.map(u => {
+                        const icon = u === 'all' ? 'fa-users text-warning' : 'fa-user-astronaut text-info';
+                        return `<div class="mention-item" onclick="insertMention('${u}')"><i class="fa-solid ${icon} me-2"></i>${u}</div>`;
+                    }).join('');
+                    mentionDropdown.classList.remove('d-none');
+                } else {
+                    mentionDropdown.classList.add('d-none');
+                }
+            } else {
+                mentionDropdown.classList.add('d-none');
+            }
+        });
+
+        function insertMention(username) {
+            const val = noteInput.value;
+            const cursorPosition = noteInput.selectionStart;
+            const textBeforeCursor = val.substring(0, cursorPosition);
+            const textAfterCursor = val.substring(cursorPosition);
+            
+            const replaceRegex = /@\w*$/;
+            const newTextBefore = textBeforeCursor.replace(replaceRegex, `@${username} `);
+            
+            noteInput.value = newTextBefore + textAfterCursor;
+            mentionDropdown.classList.add('d-none');
+            noteInput.focus();
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!noteInput.contains(e.target) && !mentionDropdown.contains(e.target)) {
+                mentionDropdown.classList.add('d-none');
+            }
+        });
+
+        async function loadTeamNotes() {
+            if (!currentTargetHash) return;
+            const timeline = document.getElementById('notes-timeline');
+            timeline.innerHTML = '<div class="text-muted text-center py-2">Loading notes...</div>';
+
+            try {
+                const res = await fetch(`/api/notes/${currentTargetHash}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                
+                timeline.innerHTML = '';
+                if (!data.notes || data.notes.length === 0) {
+                    timeline.innerHTML = '<div class="text-white-50 text-center py-3" style="opacity:0.5;">No internal logs for this target.</div>';
+                    return;
+                }
+
+                const currentUser = (localStorage.getItem('ronin_user') || '').toLowerCase();
+
+                data.notes.forEach(note => {
+                    const isMe = note.sender.toLowerCase() === currentUser;
+                    const align = isMe ? 'text-end' : 'text-start';
+                    const badgeColor = note.visibility === 'ALL' ? 'var(--tech-blue)' : 'var(--tech-orange)';
+                    const visIcon = note.visibility === 'ALL' ? 'fa-globe' : 'fa-lock';
+
+                    const formattedContent = note.content.replace(/@(\w+)/g, '<span style="color: var(--accent-gold); font-weight: bold;">@$1</span>');
+
+                    timeline.innerHTML += `
+                        <div class="mb-3 ${align}">
+                            <div class="d-inline-block text-start" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; max-width: 90%;">
+                                <div class="d-flex justify-content-between align-items-center mb-1 gap-3">
+                                    <strong style="color: ${isMe ? 'var(--accent-green)' : '#fff'}; font-size: 10px;">${note.sender.toUpperCase()}</strong>
+                                    <span style="font-size: 9px; color: ${badgeColor};"><i class="fa-solid ${visIcon} me-1"></i>${note.created_at.substring(11, 16)}</span>
+                                </div>
+                                <div style="color: #cbd5e1; line-height: 1.5;">${formattedContent}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                timeline.scrollTop = timeline.scrollHeight;
+            } catch (err) {
+                timeline.innerHTML = '<div class="text-danger text-center">Failed to load notes.</div>';
+            }
+        }
+
+        async function postNote(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('note-input');
+            const content = inputEl.value.trim();
+            if (!content || !currentTargetHash) return;
+
+            inputEl.disabled = true;
+
+            try {
+                await fetch('/api/notes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ target_hash: currentTargetHash, content: content })
+                });
+                
+                inputEl.value = '';
+                loadTeamNotes();
+            } catch (err) {
+                console.error(err);
+            } finally {
+                inputEl.disabled = false;
+                inputEl.focus();
+            }
+        }
     </script>
 </body>
 </html>

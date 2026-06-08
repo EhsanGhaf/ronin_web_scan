@@ -17,7 +17,6 @@
             --font-mono: 'JetBrains Mono', monospace;
             --text-muted: #6b7c96;
 
-            /* نئون آکسنت‌های لوکس تیره بلاکچینی و سایبرپانک */
             --accent-green: #00ffaa;
             --accent-orange: #ff9f1c;
             --accent-blue: #00bbf9;
@@ -70,28 +69,80 @@
             position: relative;
         }
 
-        /* هدر / ناوگیت کامل به همراه لوگوی اصلی */
+        /* ========================================= */
+        /* بازطراحی هدر کپسولی شناور با سقف مات‌شده */
+        /* ========================================= */
+        
+        /* لایه مات‌کننده بالای هدر تا سقف سایت */
+        .nav-top-blur-mask {
+            position: fixed; top: 0; left: 0; width: 100%; height: 20px;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            background: rgba(5, 13, 26, 0.5); z-index: 9998; pointer-events: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
         .nav-gate {
-            background: rgba(5, 13, 26, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(4, 11, 22, 0.8);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(0, 255, 170, 0.2);
             position: fixed;
-            width: 100%; top: 0; z-index: 9999;
+            top: 20px; /* فاصله از سقف سایت */
+            left: 5%; right: 5%; width: 90%; /* ایجاد حالت معلق و مستطیلی */
+            border-radius: 50px; /* حالت نیم دایره کامل در لبه‌ها */
+            z-index: 9999;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
         }
+        
+        /* خط لیزری زیر هدر کپسولی */
+        .nav-laser-scan {
+            position: absolute; bottom: 0; left: 10%; width: 80%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), var(--accent-blue), transparent);
+            animation: laserScanMove 4s linear infinite;
+        }
+        @keyframes laserScanMove { 0% { background-position: -100vw 0; } 100% { background-position: 100vw 0; } }
+
         .brand-logo {
-            width: 24px; height: 24px; object-fit: contain; filter: grayscale(100%) brightness(200%); opacity: 0.9;
+            width: 22px; height: 22px; object-fit: contain; filter: drop-shadow(0 0 8px var(--accent-green)); opacity: 0.95;
         }
+        
+        .nav-link-custom {
+            color: var(--text-muted); text-decoration: none; font-size: 0.75rem; font-family: var(--font-mono); 
+            text-transform: uppercase; letter-spacing: 1px; font-weight: 600; padding: 6px 14px; border-radius: 30px;
+            transition: all 0.25s ease;
+        }
+        .nav-link-custom:hover { color: var(--accent-green); background: rgba(0, 255, 170, 0.04); }
+        .nav-link-custom.active { color: #fff; background: rgba(0, 255, 170, 0.08); border: 1px solid rgba(0, 255, 170, 0.25); text-shadow: 0 0 8px var(--accent-green); }
+
+        /* تلمتری کارت‌های هدر */
+        .nav-ticker-container {
+            display: flex; align-items: center; gap: 20px; font-family: var(--font-mono); font-size: 10px;
+            border-left: 1px solid rgba(255,255,255,0.08); padding-left: 20px; margin-left: 20px;
+        }
+        .ticker-item { display: flex; align-items: center; gap: 6px; color: var(--text-muted); }
+        .ticker-item strong { color: #fff; }
+
+        /* دکمه لاگین هولوگرافیک جدید */
+        .btn-nav-console {
+            background: rgba(0, 255, 170, 0.05); color: var(--accent-green) !important;
+            border: 1px solid rgba(0, 255, 170, 0.3); font-family: var(--font-mono); font-size: 11px;
+            font-weight: 700; letter-spacing: 0.5px; padding: 8px 22px; border-radius: 30px; /* گرد هماهنگ با هدر */
+            text-decoration: none; transition: all 0.2s ease; text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(0, 255, 170, 0.05);
+        }
+        .btn-nav-console:hover {
+            background: var(--accent-green); color: #040a14 !important;
+            box-shadow: 0 0 20px rgba(0, 255, 170, 0.3); transform: translateY(-1px);
+        }
+        /* ========================================= */
+
         .hero-logo-box {
             display: flex; align-items: center; gap: 15px; margin-bottom: 25px;
         }
         .hero-logo-large {
             width: 42px; height: 42px; object-fit: contain; filter: grayscale(100%) brightness(200%);
         }
-        .nav-link-custom {
-            color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-family: var(--font-mono); transition: color 0.2s;
-        }
-        .nav-link-custom:hover, .nav-link-custom.active { color: #fff; }
 
         /* بج لایو اپراتور */
         .ops-badge {
@@ -258,33 +309,48 @@
         }
         .audit-bullet-node { display: flex; gap: 10px; align-items: start; margin-bottom: 10px; color: #cbd5e1; }
     @media print {
-  body {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-}
+        body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+    }
     </style>
 </head>
 <body>
 
-    <nav class="nav-gate py-3">
-        <div class="container-fluid px-5 d-flex justify-content-between align-items-center">
-            <a class="text-white text-decoration-none fw-bold small tracking-wide d-flex align-items-center gap-2" href="#" style="font-family: var(--font-mono)">
-                <img src="favicon.png" class="brand-logo" alt="logo">
-                RONIN<span style="color:var(--text-muted)">.</span>CORE
-            </a>
-            <div class="d-none d-md-flex gap-4">
-                <a href="#" class="nav-link-custom active">Home</a>
+    <div class="nav-top-blur-mask"></div>
+
+    <nav class="nav-gate py-2">
+        <div class="nav-laser-scan"></div>
+        <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <a class="text-white text-decoration-none fw-bold small tracking-wide d-flex align-items-center gap-2" href="#" style="font-family: var(--font-mono); font-size: 12.5px;">
+                    <img src="favicon.png" class="brand-logo" alt="logo">
+                    RONIN<span style="color:var(--accent-green)">.</span>CORE
+                </a>
+                
+                <div class="d-none d-xl-flex nav-ticker-container">
+                    <div class="ticker-item"><i class="fa-brands fa-bitcoin text-warning"></i> BTC DIFF: <strong id="nav-btc-diff">88.42T</strong></div>
+                    <div class="ticker-item"><i class="fa-brands fa-ethereum text-purple" style="color: var(--accent-purple)"></i> ETH GAS: <strong id="nav-eth-gas">18 Gwei</strong></div>
+                    <div class="ticker-item"><i class="fa-solid fa-circle text-success" style="font-size: 5px; animation: pulseGlow 1.5s infinite;"></i> GRID: <strong>ONLINE</strong></div>
+                </div>
+            </div>
+
+            <div class="d-none d-md-flex gap-1">
+                <a href="#" class="nav-link-custom active">Console</a>
                 <a href="#architecture" class="nav-link-custom">Infrastructure</a>
                 <a href="#bitcoin-core" class="nav-link-custom">UTXO Stream</a>
                 <a href="#ethereum-core" class="nav-link-custom">EVM Analytics</a>
-                <a href="#api-product" class="nav-link-custom">API Gate</a>
+                <a href="#api-product" class="nav-link-custom">API Gateway</a>
             </div>
-            <span class="text-muted small" style="font-family: var(--font-mono)">// SYSTEM_STATUS: <span style="color: var(--accent-green);">OPERATIONAL_GRID</span></span>
+
+            <div>
+                <a href="/portal" class="btn-nav-console"><i class="fa-solid fa-right-to-bracket me-2"></i>Login</a>
+            </div>
         </div>
     </nav>
 
-    <section class="full-section" style="margin-top: 60px;">
+    <section class="full-section" style="margin-top: 110px;">
         <div class="container px-5">
             <div class="row g-5">
                 <div class="col-lg-7">
@@ -377,7 +443,7 @@
             <span class="section-tag">// LIVE OPERATIONS</span>
             <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <h2 class="m-0">Always maintain operational visibility.</h2>
-                <a href="#" class="btn-marine-secondary btn-sm" style="font-family: var(--font-mono)">Open the dashboard &rarr;</a>
+                <a href="/portal" class="btn-marine-secondary btn-sm" style="font-family: var(--font-mono)">Open the console portal &rarr;</a>
             </div>
             <p class="tech-paragraph mb-5" style="max-width: 750px;">A unified view across cryptographic safety, transaction payload streams, and active contract security vectors — refreshed in real-time for uninterrupted situational awareness.</p>
 
@@ -490,15 +556,11 @@
                             0% { top: 0%; }
                             100% { top: 100%; }
                         }
-
-                        /* انیمیشن پالس و حذف کانترکت فیک */
                         @keyframes contractBurnEffect {
                             0% { transform: scale(1); opacity: 1; box-shadow: 0 0 12px #ff3366; }
                             50% { transform: scale(1.6); opacity: 0.8; background: #ffffff; box-shadow: 0 0 25px #ff3366, inset 0 0 10px #ff3366; }
                             100% { transform: scale(0); opacity: 0; filter: blur(5px); }
                         }
-
-                        /* انیمیشن حرکت کانترکت‌های امن */
                         @keyframes contractFloat {
                             0% { transform: translate(0, 0); opacity: 0.8; }
                             50% { transform: translate(15px, -15px); opacity: 1; }
@@ -511,17 +573,15 @@
                             const canvasContainer = document.getElementById("matrix-canvas-simulation");
                             const logElement = document.getElementById("graph-log");
 
-                            // کلمات کلیدی برای کانترکت‌های جعلی و واقعی
                             const fakeContractsNames = ["Fake_USDT_v2", "Deceptive_Vault", "HoneyPot_Router", "FakeDeposit_Inbound"];
                             const validContractsNames = ["Ronin_LP_Pool", "ZK_Verifier", "Oracle_Feed_A"];
 
                             function spawnContractNode() {
                                 if (!canvasContainer) return;
 
-                                const isMalicious = Math.random() > 0.4; // ۴۰ درصد شانس فیک بودن برای ایجاد هیجان بصری
+                                const isMalicious = Math.random() > 0.4; 
                                 const node = document.createElement("div");
 
-                                // موقعیت تصادفی اولیه روی گراف
                                 const posX = Math.floor(Math.random() * 80) + 10;
                                 const posY = Math.floor(Math.random() * 70) + 15;
 
@@ -535,33 +595,28 @@
                                 node.style.alignItems = "center";
                                 node.style.transition = "all 2s ease";
 
-                                // ایجاد بخش نقطه نئونی
                                 const dot = document.createElement("div");
                                 dot.style.width = "7px";
                                 dot.style.height = "7px";
                                 dot.style.borderRadius = "50%";
                                 dot.style.marginBottom = "4px";
 
-                                // ایجاد برچسب اسم کانترکت
                                 const label = document.createElement("span");
                                 label.style.padding = "2px 4px";
                                 label.style.borderRadius = "3px";
                                 label.style.background = "rgba(4, 12, 24, 0.8)";
 
                                 if (isMalicious) {
-                                    // کانترکت فیک (قرمز و در حال سوختن)
                                     dot.style.background = "var(--accent-red)";
                                     dot.style.animation = "contractBurnEffect 2.5s cubic-bezier(0.4, 0, 1, 1) forwards";
                                     label.innerText = fakeContractsNames[Math.floor(Math.random() * fakeContractsNames.length)] + " [!]";
                                     label.style.color = "var(--accent-red)";
                                     label.style.border = "1px solid rgba(255, 51, 102, 0.2)";
 
-                                    // بروزرسانی لوگ سیستم هنگام ردیابی تراکنش دروغین
                                     setTimeout(() => {
                                         if(logElement) logElement.innerHTML = `<span style="color: var(--accent-red); font-weight: bold;">BURNED: ${label.innerText}</span>`;
                                     }, 500);
                                 } else {
-                                    // کانترکت امن (سبز و در حال حرکت ملایم)
                                     dot.style.background = "var(--accent-green)";
                                     dot.style.boxShadow = "0 0 8px var(--accent-green)";
                                     dot.style.animation = "contractFloat 4s ease-in-out infinite";
@@ -573,15 +628,12 @@
                                 node.appendChild(label);
                                 canvasContainer.appendChild(node);
 
-                                // حذف المان‌های فیک بعد از اتمام انیمیشن سوختن، و المان‌های امن بعد از چرخه عمرشان برای سبک ماندن حافظه مرورگر
                                 setTimeout(() => {
                                     node.remove();
                                 }, isMalicious ? 2500 : 8000);
                             }
 
-                            // زمان‌بندی تزریق مداوم اسمارت‌کانترکت‌ها به شبکه گراف
                             setInterval(spawnContractNode, 1500);
-                            // لود اولیه دو گره
                             spawnContractNode();
                             spawnContractNode();
                         });
@@ -591,15 +643,13 @@
         </div>
     </section>
 
-<section id="architecture" class="full-section" style="padding: 80px 0; background: rgba(5, 13, 26, 0.4);">
+    <section id="architecture" class="full-section" style="padding: 80px 0; background: rgba(5, 13, 26, 0.4);">
         <div class="container px-5">
             <span class="section-tag">// INFRASTRUCTURE LEDGER & NEURAL INTEGRATION</span>
             <h2 class="mb-5">Ingress Infrastructure & <span style="color: var(--accent-blue);">State</span> Machine</h2>
 
             <div class="row g-4 align-items-stretch">
-
                 <div class="col-lg-5 d-flex flex-column gap-4">
-
                     <div class="glass-panel" style="padding: 22px; flex: 1;">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h3 style="font-size: 1.1rem; color: #fff; margin: 0;">01 / Hex Ingestion</h3>
@@ -629,41 +679,33 @@
                             Implements high-precision numeric evaluation modules supporting large multi-precision integer architectures. Eliminates scaling errors across asset representations during structural multi-chain tracking loops.
                         </p>
                     </div>
-
                 </div>
 
                 <div class="col-lg-7">
                     <div class="glass-panel h-100 d-flex flex-column justify-content-between" style="padding: 35px; border-color: rgba(0, 255, 170, 0.25); background: linear-gradient(135deg, rgba(6, 22, 44, 0.7) 0%, rgba(4, 10, 20, 0.9) 100%); box-shadow: 0 0 35px rgba(0, 255, 170, 0.08); position: relative; overflow: hidden;">
-
                         <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--accent-green); filter: blur(90px); opacity: 0.15; pointer-events: none;"></div>
-
                         <div>
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-green); letter-spacing: 1px; font-weight: 700;">// ENTERPRISE NEURAL HUB</span>
                                 <span class="badge" style="background: rgba(0, 255, 170, 0.1); color: var(--accent-green); border: 1px solid rgba(0, 255, 170, 0.2); font-family: var(--font-mono); font-size: 10px; padding: 5px 10px;">🔴 LIVE API STREAM</span>
                             </div>
-
                             <h3 style="font-size: 1.6rem; color: #fff; font-weight: 800; margin-bottom: 15px;">04 / AI Autonomous Agent Ingress</h3>
-
                             <p class="text-white-50 lh-base" style="font-size: 13.5px; opacity: 0.9; margin-bottom: 25px;">
                                 Exposes structural telemetry pipelines to third-party Neural Networks, Fraud-Detection models, and LLM Agents via secure, ultra-low-latency webhook streams.
                                 <br><br>
                                 <strong style="color: #fff;">Enterprise Empowerment:</strong> External companies can natively mount their autonomous AI models to ingest our decoded state variables. This allows enterprise AI instances to instantly execute machine-learning threat detection on deceptive contract invocations, suspicious velocity spikes, and anomalous cross-chain deposit behaviors in real-time.
                             </p>
                         </div>
-
                         <div style="background: rgba(3, 9, 18, 0.7); border: 1px solid rgba(255,255,255,0.03); border-radius: 8px; padding: 18px; font-family: var(--font-mono);">
                             <div class="text-white-50 small mb-2" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-network-wired me-2" style="color: var(--accent-green);"></i>Enterprise AI Connection Blueprint:</div>
                             <div style="font-size: 11.5px; color: #cbd5e1; direction: ltr; text-align: left; line-height: 1.6;">
-                                <span style="color: var(--accent-blue);">POST</span> <span style="color: var(--text-muted);">http://localhost:8080/api/v1/webhook</span>
+                                <span style="color: var(--accent-blue);">POST</span> <span style="color: var(--text-muted);">/api/v1/webhook</span>
                                 <br>
                                 <span style="color: var(--text-muted); font-size: 10.5px;">Payload: { "event": "ANOMALY_DETECTED", "confidence_threshold": "0.94" }</span>
                             </div>
                         </div>
-
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
@@ -673,23 +715,11 @@
             <span class="section-tag">// DATA_STREAM_NODE_01</span>
             <h2>Bitcoin Protocol & <span style="color: var(--accent-orange);">UTXO</span> Telemetry</h2>
             <div class="glass-panel">
-                <div class="telemetry-row mb-5">
-                    <div class="telemetry-box">
-                        <div class="data-label">Network Difficulty</div>
-                        <div class="huge-number" id="btc-diff">88.42T</div>
-                    </div>
-                    <div class="telemetry-box">
-                        <div class="data-label">Mempool Queue Size</div>
-                        <div class="huge-number">142K</div>
-                    </div>
-                    <div class="telemetry-box">
-                        <div class="data-label">Next Block Fee Rate</div>
-                        <div class="huge-number text-white-50" id="btc-fee">26<span class="fs-5 text-muted">s/vB</span></div>
-                    </div>
-                    <div class="telemetry-box">
-                        <div class="data-label">SegWit Ratio</div>
-                        <div class="huge-number">94.2%</div>
-                    </div>
+                <div class="row mb-5 g-3">
+                    <div class="col-md-3"><div class="telemetry-box"><div class="data-label">Network Difficulty</div><div class="huge-number" id="btc-diff">88.42T</div></div></div>
+                    <div class="col-md-3"><div class="telemetry-box"><div class="data-label">Mempool Queue Size</div><div class="huge-number">142K</div></div></div>
+                    <div class="col-md-3"><div class="telemetry-box"><div class="data-label">Next Block Fee Rate</div><div class="huge-number text-white-50" id="btc-fee">26<span class="fs-5 text-muted">s/vB</span></div></div></div>
+                    <div class="col-md-3"><div class="telemetry-box"><div class="data-label">SegWit Ratio</div><div class="huge-number">94.2%</div></div></div>
                 </div>
                 <h3>Sovereign Script Verification & Witness Tracking Architecture</h3>
                 <p class="tech-paragraph mb-0">The Bitcoin integration layer directly isolates multi-signature inputs via native JSON-RPC tracking node vectors. Instead of relying on centralized third-party indexers, the core engine monitors raw transaction scripts (ScriptPubKeys) directly inside block template updates to parse complex UTXO state conditions.</p>
@@ -702,19 +732,10 @@
             <span class="section-tag">// DATA_STREAM_NODE_02</span>
             <h2>Ethereum State & <span style="color: var(--accent-purple);">EVM</span> Assets</h2>
             <div class="glass-panel">
-                <div class="telemetry-row mb-4">
-                    <div class="telemetry-box">
-                        <div class="data-label">Base Gas Price</div>
-                        <div class="huge-number text-white-50" id="eth-gas">18<span class="fs-5 text-muted">Gwei</span></div>
-                    </div>
-                    <div class="telemetry-box">
-                        <div class="data-label">Active Validators</div>
-                        <div class="huge-number">1.03M</div>
-                    </div>
-                    <div class="telemetry-box">
-                        <div class="data-label">Slot Latency</div>
-                        <div class="huge-number">12.0s</div>
-                    </div>
+                <div class="row mb-4 g-3">
+                    <div class="col-md-4"><div class="telemetry-box"><div class="data-label">Base Gas Price</div><div class="huge-number text-white-50" id="eth-gas">18<span class="fs-5 text-muted">Gwei</span></div></div></div>
+                    <div class="col-md-4"><div class="telemetry-box"><div class="data-label">Active Validators</div><div class="huge-number">1.03M</div></div></div>
+                    <div class="col-md-4"><div class="telemetry-box"><div class="data-label">Slot Latency</div><div class="huge-number">12.0s</div></div></div>
                 </div>
 
                 <div class="nft-cards-grid">
@@ -753,11 +774,11 @@
                         <p class="tech-paragraph mb-4" style="font-size:0.95rem;">Expose your isolated monitoring hub to institutional frameworks. Accepts real-time inbound metadata payload handshakes.</p>
                         <div class="mb-3">
                             <div class="text-muted small mb-1" style="font-family:var(--font-mono)">Authorization Layer Required:</div>
-                            <div class="small text-white fw-bold" style="font-family:var(--font-mono)">X-API-KEY: ronin_[operator_session_hash]</div>
+                            <div class="small text-white fw-bold" style="font-family:var(--font-mono)">key: ronin_[operator_session_hash]</div>
                         </div>
                         <div>
                             <div class="text-muted small mb-1" style="font-family:var(--font-mono)">Gateway Endpoint Access:</div>
-                            <div class="small text-white fw-bold" style="font-family:var(--font-mono)">POST http://localhost:8080/api/v1/webhook</div>
+                            <div class="small text-white fw-bold" style="font-family:var(--font-mono)">POST /api/v1/webhook</div>
                         </div>
                     </div>
                     <div class="col-xl-7">
@@ -783,8 +804,8 @@
             imageElement.src = "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=600&auto=format&fit=crop";
         }
 
-        // افکت تایپ متن هیرو با مفهوم کامل پایش تراکنش‌های بلاکچین
-        const textToType = "Sail through multi-chain states with <span class='highlight-gold'>complete confidence</span>.";
+        // افکت تایپ متن هیرو
+        const textToType = "Payload tracking pipelines with <span class='highlight-gold'>autonomous security</span>.";
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("typewriter-target").innerHTML = textToType + "<span class='typed-cursor'>|</span>";
         });
@@ -792,12 +813,21 @@
         // رفرش تلمتری ثانیه‌ای لایو عمومی شبکه
         setInterval(() => {
             const now = new Date();
+            const btcFeeValue = (22 + Math.floor(Math.random() * 10));
+            const ethGasValue = (14 + Math.floor(Math.random() * 6));
+
             if(document.getElementById('live-time')) document.getElementById('live-time').innerText = now.toISOString().substr(11, 8) + " UTC";
-            if(document.getElementById('btc-fee')) document.getElementById('btc-fee').innerHTML = (22 + Math.floor(Math.random() * 10)) + "<span class='fs-5 text-muted'>s/vB</span>";
-            if(document.getElementById('eth-gas')) document.getElementById('eth-gas').innerHTML = (14 + Math.floor(Math.random() * 6)) + "<span class='fs-5 text-muted'>Gwei</span>";
+            
+            // آپدیت آمارهای هیرو داکس
+            if(document.getElementById('btc-fee')) document.getElementById('btc-fee').innerHTML = btcFeeValue + "<span class='fs-5 text-muted'>s/vB</span>";
+            if(document.getElementById('eth-gas')) document.getElementById('eth-gas').innerHTML = ethGasValue + "<span class='fs-5 text-muted'>Gwei</span>";
+            
+            // آپدیت همزمان تیکرهای هدر جدید
+            if(document.getElementById('nav-btc-diff')) document.getElementById('nav-btc-diff').innerText = "88." + (40 + Math.floor(Math.random() * 9)) + "T";
+            if(document.getElementById('nav-eth-gas')) document.getElementById('nav-eth-gas').innerText = ethGasValue + " Gwei";
         }, 1000);
 
-        // 🛠️ جاوااسکریپت موتور ممیزی تعاملی متصل به ورودی کاربر
+        // جاوااسکریپت موتور ممیزی تعاملی
         document.addEventListener("DOMContentLoaded", () => {
             const inputField = document.getElementById("user-crypto-input");
             const analyzeBtn = document.getElementById("btn-run-analysis");
@@ -828,7 +858,6 @@
 
                     let bulletsHtml = "";
 
-                    // ۱. سناریو آدرس ولت (scanAddressAcrossChains)
                     if ((query.startsWith("0x") && query.length === 42) || (query.startsWith("T") && query.length === 34)) {
                         const network = query.startsWith("0x") ? "Ethereum/BSC (EVM)" : "TRON Network";
                         const isContract = query.toLowerCase().includes("a905") || (query.length === 42 && query.endsWith("00"));
@@ -846,14 +875,13 @@
                             <div class="audit-bullet-node">
                                 ${isGlobalBlacklisted ?
                                     `<i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-red); margin-top:4px;"></i>
-                                     <div><strong>Risk Scoring:</strong> <span style="color: var(--accent-red); font-weight:bold;">CRITICAL ALERT!</span> Address flagged in global USDT Blacklist contract ledger. Hot-wallet ingress blocked.</div>` :
+                                     <div><strong>Risk Scoring:</strong> <span style="color: var(--accent-red); font-weight:bold;">CRITICAL ALERT!</span> Address flagged in global AML contract ledger. Ingress blocked.</div>` :
                                     `<i class="fa-solid fa-shield-check" style="color: var(--accent-green); margin-top:4px;"></i>
-                                     <div><strong>Risk Scoring:</strong> <span style="color: var(--accent-green);">CLEARED</span>. No malicious entities, invariants, or Tether sanctions detected. Safe for ledger synchronization.</div>`
+                                     <div><strong>Risk Scoring:</strong> <span style="color: var(--accent-green);">CLEARED</span>. No malicious entities or sanctions detected. Safe for ledger synchronization.</div>`
                                 }
                             </div>
                         `;
                     }
-                    // ۲. سناریو هش تراکنش (scanTxAcrossChains)
                     else if (query.length >= 50) {
                         const isBsc = query.startsWith("0x55") || query.includes("bb");
                         const detectedNet = isBsc ? "BSC Chain" : "Ethereum State Machine";
@@ -867,7 +895,7 @@
                             <div class="audit-bullet-node">
                                 ${isFakeAsset ?
                                     `<i class="fa-solid fa-radiation" style="color: var(--accent-red); margin-top:4px;"></i>
-                                     <div><strong>Deception Engine:</strong> <span style="color: var(--accent-red); font-weight:bold;">SECURITY_ALERT! FAKE DEPOSIT INGRESS DETECTED.</span> The contract address emitting the transfer log does NOT match the official whitelisted USDT asset. Capital pollution neutralized.</div>` :
+                                     <div><strong>Deception Engine:</strong> <span style="color: var(--accent-red); font-weight:bold;">SECURITY_ALERT! FAKE DEPOSIT INGRESS DETECTED.</span> The contract address emitting the transfer log does NOT match the official whitelisted asset. Capital pollution neutralized.</div>` :
                                     `<i class="fa-solid fa-circle-check" style="color: var(--accent-green); margin-top:4px;"></i>
                                      <div><strong>Authenticity Check:</strong> Verified signature match with official whitelisted contract destination. Ledger modification allowed.</div>`
                                 }
@@ -882,7 +910,6 @@
                             </div>
                         `;
                     }
-                    // ۳. سناریو دیتای مخدوش
                     else {
                         bulletsHtml += `
                             <div class="audit-bullet-node">

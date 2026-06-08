@@ -172,7 +172,7 @@
         <div id="local-loader" class="loading-overlay d-none">
             <div class="text-center">
                 <i class="fa-solid fa-satellite-dish fa-spin mb-3" style="font-size:2rem; color:var(--accent-green);"></i>
-                <div class="text-white fw-bold small" style="font-family: var(--font-mono); letter-spacing: 1px;">CONNECTING_LOCAL_NODE...</div>
+                <div class="text-white fw-bold small" style="font-family: var(--font-mono); letter-spacing: 1px;">CONNECTING_NODE...</div>
                 <div class="small mt-1" style="font-family: var(--font-mono); color: var(--text-muted); font-size: 10px;">TRANSMITTING ENCRYPTED PORTAL DATA</div>
             </div>
         </div>
@@ -189,7 +189,7 @@
             </div>
             <button type="submit" class="btn btn-raw mb-3">[ INITIALIZE_CONNECTION ]</button>
             <div class="text-center small" style="color: var(--text-muted); font-size: 12px;">
-                Need local access node? <span class="auth-toggle" onclick="toggleAuth(true)">Register Operator</span>
+                Need access node? <span class="auth-toggle" onclick="toggleAuth(true)">Register Operator</span>
             </div>
         </form>
 
@@ -240,14 +240,14 @@
             const alertBox = document.getElementById('auth-alert');
 
             alertBox.classList.add('d-none');
-            // ریست کردن استایل آلرت به حالت ارور پیش‌فرض در صورت تلاش مجدد
             alertBox.style.background = "rgba(255, 51, 102, 0.05)";
             alertBox.style.borderColor = "rgba(255, 51, 102, 0.15)";
             alertBox.style.color = "var(--accent-red)";
             setLoader(true);
 
             try {
-                const res = await fetch('http://localhost:8080/api/auth/login', {
+                // مسیر دهی نسبی (Relative Path) برای حل مشکل اینترنت پابلیک
+                const res = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
@@ -258,7 +258,9 @@
                 localStorage.setItem('ronin_token', data.token);
                 localStorage.setItem('ronin_api_key', data.apiKey);
                 localStorage.setItem('ronin_user', username);
-                window.location.href = '/dashboard.html';
+                
+                // هدایت به مسیر هماهنگ با سرور Node.js
+                window.location.href = '/dashboard';
             } catch(err) {
                 setLoader(false);
                 alertBox.innerText = `[✕] RESOLUTION_FAILURE: ${err.message}`;
@@ -273,7 +275,6 @@
             const secretKey = sanitizeInput(document.getElementById('reg-secret').value);
             const alertBox = document.getElementById('auth-alert');
 
-            // ریست استایل به حالت ارور
             alertBox.style.background = "rgba(255, 51, 102, 0.05)";
             alertBox.style.borderColor = "rgba(255, 51, 102, 0.15)";
             alertBox.style.color = "var(--accent-red)";
@@ -286,7 +287,8 @@
 
             setLoader(true);
             try {
-                const res = await fetch('http://localhost:8080/api/auth/register', {
+                // مسیر دهی نسبی (Relative Path) برای حل مشکل اینترنت پابلیک
+                const res = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password, secret_key: secretKey })
@@ -296,7 +298,6 @@
 
                 if(!res.ok) throw new Error(data.error || "Registration rejected.");
 
-                // تغییر استایل داینامیک باکس پیام موفقیت به سبز نئونی لوکس
                 alertBox.style.background = "rgba(0, 255, 170, 0.05)";
                 alertBox.style.borderColor = "rgba(0, 255, 170, 0.2)";
                 alertBox.style.color = "var(--accent-green)";
